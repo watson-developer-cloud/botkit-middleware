@@ -24,8 +24,7 @@ var bot = controller.spawn({
   TWILIO_API_SECRET: process.env.TWILIO_API_SECRET,
   TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
   identity: process.env.BOT_NAME,
-  autojoin: true,
-  bot_type: 'twilio'
+  autojoin: true
 });
 controller.hears(['.*'], 'message_received', function(bot, message) {
   bot.reply(message, message.watsonData.output.text.join('\n'));

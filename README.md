@@ -42,11 +42,9 @@ var slackController = Botkit.slackbot();
 Spawn a Slack bot using the controller:
 ```js
 var slackBot = slackController.spawn({
-    token: YOUR_SLACK_TOKEN,
-    bot_type: 'slack'
+    token: YOUR_SLACK_TOKEN
 });
 ```
-Notice how we add the _bot_type_ property so the middleware knows the source of the incoming message.
 
 Create the middleware object which you'll use to connect to Conversation service:
 ```js
@@ -57,7 +55,6 @@ Tell your Slackbot to use the _watsonMiddleware_ for incoming messages:
 ```js
 slackController.middleware.receive.use(watsonMiddleware.receive);
 slackBot.startRTM();
-watsonMiddleware.slack = slackController;
 ```
 
 Finally, make your bot _listen_ to incoming messages and respond with Watson Conversation:
