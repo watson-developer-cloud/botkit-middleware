@@ -21,21 +21,18 @@ var middleware = require('botkit-middleware-watson');
 module.exports = function(app) {
   if (process.env.USE_SLACK) {
     var Slack = require('./bot-slack');
-    middleware.slack = Slack.controller;
     Slack.controller.middleware.receive.use(middleware.receive);
     Slack.bot.startRTM();
     console.log('Slack bot is live');
   }
   if (process.env.USE_FACEBOOK) {
     var Facebook = require('./bot-facebook');
-    middleware.facebook = Facebook.controller;
     Facebook.controller.middleware.receive.use(middleware.receive);
     Facebook.controller.createWebhookEndpoints(app, Facebook.bot);
     console.log('Facebook bot is live');
   }
   if (process.env.USE_TWILIO) {
     var Twilio = require('./bot-twilio');
-    middleware.twilio = Twilio.controller;
     Twilio.controller.middleware.receive.use(middleware.receive);
     Twilio.controller.createWebhookEndpoints(app, Twilio.bot);
     console.log('Twilio bot is live');

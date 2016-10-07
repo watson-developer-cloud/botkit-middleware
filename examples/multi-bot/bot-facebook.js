@@ -18,8 +18,7 @@ var Botkit = require('botkit');
 
 var controller = Botkit.facebookbot({
   access_token: process.env.FB_ACCESS_TOKEN,
-  verify_token: process.env.FB_VERIFY_TOKEN,
-  bot_type: 'facebook'
+  verify_token: process.env.FB_VERIFY_TOKEN
 });
 
 var bot = controller.spawn();

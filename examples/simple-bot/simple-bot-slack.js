@@ -19,12 +19,11 @@ require('dotenv').load();
 var Botkit = require('botkit');
 var express = require('express');
 var middleware = require('botkit-middleware-watson');
-console.log(middleware);
+
 // Configure your bot.
 var slackController = Botkit.slackbot();
 var slackBot = slackController.spawn({
-  token: process.env.SLACK_TOKEN,
-  bot_type: 'slack'
+  token: process.env.SLACK_TOKEN
 });
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   slackController.log('Slack message received');
@@ -34,7 +33,6 @@ slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], f
 // Connect to Watson middleware
 slackController.middleware.receive.use(middleware.receive);
 slackBot.startRTM();
-middleware.slack = slackController;
 
 // Create an Express app
 var app = express();

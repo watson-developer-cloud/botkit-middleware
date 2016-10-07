@@ -74,4 +74,4 @@ Once you have added your credentials in the `.env` file, simply start the exampl
 node server.js
 ```
 
-Voila! You're all set! :)
+Voila! You're all set! Start chatting on your social channel to test your bot. :)
