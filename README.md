@@ -35,12 +35,12 @@ Otherwise, follow [these instructions](https://github.com/howdyai/botkit/blob/ma
 This section walks you through code snippets to set up your Slack bot. If you want, you can jump straight to the full example [here](/examples/simple-bot).
 
 In your app, add the following lines to create your Slack controller using Botkit:
-```
+```js
 var slackController = Botkit.slackbot();
 ```
 
 Spawn a Slack bot using the controller:
-```
+```js
 var slackBot = slackController.spawn({
     token: YOUR_SLACK_TOKEN,
     bot_type: 'slack'
@@ -49,19 +49,19 @@ var slackBot = slackController.spawn({
 Notice how we add the _bot_type_ property so the middleware knows the source of the incoming message.
 
 Create the middleware object which you'll use to connect to Conversation service:
-```
+```js
 var watsonMiddleware = require('botkit-middleware-watson');
 ```
 
 Tell your Slackbot to use the _watsonMiddleware_ for incoming messages:
-```
+```js
 slackController.middleware.receive.use(watsonMiddleware.receive);
 slackBot.startRTM();
 watsonMiddleware.slack = slackController;
 ```
 
 Finally, make your bot _listen_ to incoming messages and respond with Watson Conversation:
-```
+```js
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
 });
