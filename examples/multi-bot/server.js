@@ -18,9 +18,13 @@ require('dotenv').load();
 
 var express = require('express');
 var bodyParser = require('body-parser');
+var verify = require('./security');
 var app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+  verify: verify
+}));
+
 var port = process.env.PORT || 5000;
 app.set('port', port);
 
