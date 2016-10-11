@@ -6,7 +6,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 * Automatically manages context in multi-turn conversations to keep track of where the user left off in the conversation.
 * Allows greater flexibility in message handling.
 * Handles external databases for context storage.
-* Easily integrate with third-party services.
+* Easily integrates with third-party services.
 * Exposes the following functions to developers:
   * `before`: pre-process requests before sending to Watson Conversation (Conversation).
   * `after` : post-process responses before forwarding them to Botkit.
