@@ -23,7 +23,7 @@ The middleware needs you to provide the `username`, `password`, and `workspace_i
 If you do not have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
 
 ### Acquire channel credentials
-This document shows code snippets for using a Slack bot with the middleware. Look at the [examples/multi-bot](/examples/multi-bot) folder for a multi-bot example app that shows how to connect to Slack, Facebook, and Twilio IPM bots running on a single Express server.
+This document shows code snippets for using a Slack bot with the middleware. (If you want examples for the other channels, see the [examples/multi-bot](/examples/multi-bot) folder. The multi-bot example app shows how to connect to Slack, Facebook, and Twilio IPM bots running on a single Express server.)
 
 You need a _Slack token_ for your Slack bot to talk to Conversation.
 
