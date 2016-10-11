@@ -11,9 +11,9 @@ This document describes how to set up a sample Express app which talks to Slack,
 ## Getting credentials
 
 ### Watson Conversation
-Follow the steps outlined in [this document](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#service-credentials) and paste your Conversation bot's credentials in the sample `.env` file in the project directory.
+Follow the steps outlined in [this document](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-application-environmnet) and paste your Conversation bot's credentials in the sample `.env` file in the project directory.
 
-If you don't have a Conversation service instance yet, then follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin-1) to get started.
+If you don't have a Conversation service instance yet, then follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
 
 ### Slack
 Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/readme-slack.md) from Botkit.
