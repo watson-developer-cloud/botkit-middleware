@@ -1,6 +1,6 @@
 # Multi-channel bot
 
-This document describes how to set up a sample Express app which talks to Slack, Facebook and Twilio bots.
+This document describes how to set up a sample Express app which talks to Slack, Facebook, and Twilio bots.
 
 1. Install all dependencies:
 
@@ -13,7 +13,7 @@ This document describes how to set up a sample Express app which talks to Slack,
 ### Watson Conversation
 Follow the steps outlined in [this document](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-application-environmnet) and paste your Conversation bot's credentials in the sample `.env` file in the project directory.
 
-If you don't have a Conversation service instance yet, then follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
+If you don't have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
 
 ### Slack
 Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/readme-slack.md) from Botkit.
@@ -43,7 +43,7 @@ FB_VERIFY_TOKEN=<your verify token>
 FB_APP_SECRET=<your apps secret key>
 ```
 
-When you're ready to test your bot, simply go to your Facebook homepage and find the page you created. Click on _Message_ to start chatting with your Watson Conversation bot!
+When you're ready to test your bot, go to your Facebook homepage and find the page you created. Click on _Message_ to start chatting with your Watson Conversation bot!
 
 ### Twilio IPM
 Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/readme-twilioipm.md) from Botkit.
@@ -67,11 +67,11 @@ If you are connecting to a channel, you need to add `USE_<channel_name>` in the 
 USE_SLACK=any_value
 USE_FACEBOOK=any_value
 ```
-The value of these variables doesn't matter, as long as they're present, the middleware knows it needs to connect to these channels.
+The value of these variables doesn't matter, as long as they're present. The middleware knows it needs to connect to these channels.
 
-Once you have added your credentials in the `.env` file, simply start the example express app by running this command:
+Once you have added your credentials in the `.env` file, start the example express app by running this command:
 ```
 node server.js
 ```
 
-Voila! You're all set! Start chatting on your social channel to test your bot. :)
+Voila! You're all set! Start chatting on your social channel to test your bot.
