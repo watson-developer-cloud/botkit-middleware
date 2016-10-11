@@ -18,9 +18,9 @@ $ npm install botkit-middleware-watson --save
 
 ## Usage
 ### Acquire Watson Conversation credentials
-The middleware needs you to provide the `username`, `password`, and `workspace_id` of your Watson Conversation chat bot. If you have an existing Conversation service instance, follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#service-credentials) to get your credentials.
+The middleware needs you to provide the `username`, `password`, and `workspace_id` of your Watson Conversation chat bot. If you have an existing Conversation service instance, follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-application-environmnet) to get your credentials.
 
-If you do not have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin-1) to get started.
+If you do not have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
 
 ### Acquire channel credentials
 This document shows code snippets for using a Slack bot with the middleware. Look at the [examples/multi-bot](/examples/multi-bot) folder for a multi-bot example app that shows how to connect to Slack, Facebook, and Twilio IPM bots running on a single Express server.
