@@ -32,7 +32,7 @@ If you have an existing Slack bot, then copy the Slack token from your Slack set
 Otherwise, follow [Botkit's instructions](https://github.com/howdyai/botkit/blob/master/readme-slack.md) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
 ### Bot setup
 
-This section walks you through code snippets to set up your Slack bot. If you want, you can jump straight to the full example [here](/examples/simple-bot).
+This section walks you through code snippets to set up your Slack bot. If you want, you can jump straight to the [full example](/examples/simple-bot).
 
 In your app, add the following lines to create your Slack controller using Botkit:
 ```js
