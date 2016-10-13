@@ -66,3 +66,32 @@ slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], f
 The middleware attaches the `watsonData` object to _message_. This contains the text response from Conversation.
 
 Then you're all set! 
+
+### Using `before` and `after` functions
+
+The _before_ and _after_ callbacks are available through the Watson middleware object.
+
+```js
+var middleware = require('botkit-middleware-watson');
+```
+
+These can be customized as follows:
+
+```js
+middleware.before = function(message, conversationPayload, callback) {
+    // Code here gets executed before making the call to Conversation.
+    callback(null, customizedPayload);
+  }
+```
+
+```js
+  middleware.after = function(message, conversationResponse, callback) {
+    // Code here gets executed after the call to Conversation.
+    callback(null, conversationResponse);
+  }
+```
+
+This comes in handy to:
+- Make database updates
+- Update the context in the payload
+- Call some external service before/after calling Conversation
