@@ -67,6 +67,7 @@ The middleware attaches the `watsonData` object to _message_. This contains the 
 
 Then you're all set!
 
+<<<<<<< HEAD
 ### Using `before` and `after` functions
 
 The _before_ and _after_ callbacks are available through the Watson middleware object.
@@ -96,6 +97,8 @@ This comes in handy to:
 - Update the context in the payload
 - Call some external service before/after calling Conversation
 
+=======
+>>>>>>> e480d4c52f0c69764969ab2ea95971a95a5caaac
 ## License
 
 This library is licensed under Apache 2.0. Full license text is available in [COPYING][http://www.apache.org/licenses/LICENSE-2.0].
