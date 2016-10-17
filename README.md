@@ -65,4 +65,8 @@ slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], f
 ```
 The middleware attaches the `watsonData` object to _message_. This contains the text response from Conversation.
 
-Then you're all set! 
+Then you're all set!
+
+## License
+
+This library is licensed under Apache 2.0. Full license text is available in [COPYING][http://www.apache.org/licenses/LICENSE-2.0].
