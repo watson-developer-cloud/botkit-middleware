@@ -29,7 +29,7 @@ describe('conversation_turns()', function() {
     password: 'bruce-wayne',
     url: 'http://ibm.com:80',
     version: 'v1',
-    version_date: '2016-07-11'
+    version_date: '2016-09-20'
   };
   var workspace_id = 'zyxwv-54321';
   var path = '/v1/workspaces/' + workspace_id + '/message';
