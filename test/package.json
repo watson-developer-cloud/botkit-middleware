@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Test suite for Watson middleware.",
   "scripts": {
-    "test": "mocha ./*"
+    "test": "mocha ./*/*.js"
   },
   "repository": {
     "type": "git",
