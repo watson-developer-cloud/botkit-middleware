@@ -98,4 +98,4 @@ This comes in handy to:
 
 ## License
 
-This library is licensed under Apache 2.0. Full license text is available in [COPYING](http://www.apache.org/licenses/LICENSE-2.0).
+This library is licensed under Apache 2.0. Full license text is available in [LICENSE](http://www.apache.org/licenses/LICENSE-2.0).
