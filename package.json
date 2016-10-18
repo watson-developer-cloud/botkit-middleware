@@ -19,6 +19,12 @@
     "watson"
   ],
   "license": "Apache-2.0",
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "botkit": "^0.2.2",
+    "nock": "^8.1.0",
+    "mocha": "^3.1.0"
+  },
   "dependencies": {
     "bluebird": "^3.4.6",
     "debug": "^2.2.0",

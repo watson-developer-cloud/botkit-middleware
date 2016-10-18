@@ -1,0 +1,20 @@
+{
+  "name": "botkit-middleware-watson-test",
+  "version": "0.0.1",
+  "description": "Test suite for Watson middleware.",
+  "scripts": {
+    "test": "mocha ./*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/watson-developer-cloud/botkit-middleware.git"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "assert": "^1.4.1",
+    "botkit": "^0.2.2",
+    "nock": "^8.1.0",
+    "mocha": "^3.1.0",
+    "watson-developer-cloud": "^2.4.1"
+  }
+}

@@ -65,7 +65,7 @@ slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], f
 ```
 The middleware attaches the `watsonData` object to _message_. This contains the text response from Conversation.
 
-Then you're all set! 
+Then you're all set!
 
 ### Using `before` and `after` functions
 
@@ -95,3 +95,7 @@ This comes in handy to:
 - Make database updates
 - Update the context in the payload
 - Call some external service before/after calling Conversation
+
+## License
+
+This library is licensed under Apache 2.0. Full license text is available in [COPYING](http://www.apache.org/licenses/LICENSE-2.0).
