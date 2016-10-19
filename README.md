@@ -12,7 +12,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
   * `after` : post-process responses before forwarding them to Botkit.
 
 ## Installation
-```
+```sh
 $ npm install botkit-middleware-watson --save
 ```
 
