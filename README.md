@@ -30,6 +30,7 @@ You need a _Slack token_ for your Slack bot to talk to Conversation.
 If you have an existing Slack bot, then copy the Slack token from your Slack settings page.
 
 Otherwise, follow [Botkit's instructions](https://github.com/howdyai/botkit/blob/master/readme-slack.md) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
+
 ### Bot setup
 
 This section walks you through code snippets to set up your Slack bot. If you want, you can jump straight to the [full example](/examples/simple-bot).
@@ -89,6 +90,40 @@ middleware.before = function(message, conversationPayload, callback) {
     // Code here gets executed after the call to Conversation.
     callback(null, conversationResponse);
   }
+```
+
+### Hearing intents
+
+The Watson middleware also provides a `hears()` middleware provides a mechanism to
+developers to fire handler functions based on the most likely intent of the user.
+This allows a developer to create handler functions for specific intents in addition
+to using the data provided by Watson to power the conversation.
+
+The `hears()` middleware can be used on individual handler functions, or can be used globally.
+
+Used on an individual handler:
+
+```js
+slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], watsonMiddleware.hear, function(bot, message) {
+
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+
+    // now do something special related to the hello intent
+
+});
+```
+
+Used globally:
+
+```js
+slackController.changeEars(watsonMiddleware.hear);
+
+slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+
+    // now do something special related to the hello intent
+});
 ```
 
 This comes in handy to:
