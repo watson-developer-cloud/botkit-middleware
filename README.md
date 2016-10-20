@@ -1,4 +1,4 @@
-# Use IBM Watson's Conversation service to chat with your Botkit-powered Bot!
+# Use IBM Watson's Conversation service to chat with your Botkit-powered Bot! [![Build Status](https://travis-ci.org/watson-developer-cloud/botkit-middleware.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/botkit-middleware)
 
 This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Conversation](https://www.ibm.com/watson/developercloud/conversation.html) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
 
@@ -30,6 +30,7 @@ You need a _Slack token_ for your Slack bot to talk to Conversation.
 If you have an existing Slack bot, then copy the Slack token from your Slack settings page.
 
 Otherwise, follow [Botkit's instructions](https://github.com/howdyai/botkit/blob/master/readme-slack.md) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
+
 ### Bot setup
 
 This section walks you through code snippets to set up your Slack bot. If you want, you can jump straight to the [full example](/examples/simple-bot).
@@ -98,4 +99,4 @@ This comes in handy to:
 
 ## License
 
-This library is licensed under Apache 2.0. Full license text is available in [LICENSE](http://www.apache.org/licenses/LICENSE-2.0).
+This library is licensed under Apache 2.0. Full license text is available in [LICENSE](LICENSE).
