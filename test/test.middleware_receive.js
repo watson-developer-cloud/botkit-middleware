@@ -15,11 +15,13 @@
  */
 
 var assert = require('assert');
-var utils = require('../../lib/middleware/utils');
-var nock = require('nock');
+var Botkit = require('botkit');
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
+var nock = require('nock');
 
-describe('conversation()', function() {
+var middleware = require('../lib/middleware/index');
+
+describe('conversation_turns()', function() {
 
   //Watson Conversation params
   var service = {
@@ -29,9 +31,25 @@ describe('conversation()', function() {
     version: 'v1',
     version_date: '2016-09-20'
   };
-  var workspace = 'zyxwv-54321';
-  var path = '/v1/workspaces/' + workspace + '/message';
-  var conversation = new ConversationV1(service);
+  var workspace_id = 'zyxwv-54321';
+  var path = '/v1/workspaces/' + workspace_id + '/message';
+
+  // Botkit params
+  var controller = Botkit.slackbot();
+  var bot = controller.spawn({
+    token: 'abc123'
+  });
+  var message = {
+    "type": "message",
+    "channel": "D2BQEJJ1X",
+    "user": "U2BLZSKFG",
+    "text": "hi",
+    "ts": "1475776074.000004",
+    "team": "T2BM5DPJ6"
+  };
+
+  middleware.conversation = new ConversationV1(service);
+  middleware.workspace = workspace_id;
 
   before(function() {
     nock.disableNetConnect();
@@ -41,7 +59,7 @@ describe('conversation()', function() {
     nock.cleanAll();
   });
 
-  it('should initiate a conversation', function(done) {
+  it('should make first call to Conversation', function(done) {
     var expected = {
       "intents": [],
       "entities": [],
@@ -68,27 +86,24 @@ describe('conversation()', function() {
         }
       }
     };
-
     nock(service.url)
       .post(path + '?version=' + service.version_date)
-      .reply(200, expected);
+      .reply(200, expected)
 
-    utils.postMessage(conversation, {
-        workspace_id: workspace,
-        input: {
-          text: 'hi'
-        }
-      },
-      function(err, response) {
-        if (err) {
-          return done(err);
-        }
-        assert.deepEqual(response, expected, 'Conversation response: ' + response + ' does not match expected response ' + expected);
-        done();
-      });
+    middleware.receive(bot, message, function(err, response) {
+      if (err) {
+        return done(err);
+      }
+      assert(message.watsonData, 'watsonData field missing in message!');
+      assert.deepEqual(message.watsonData, expected, 'Received Watson Conversation data: ' + message.watsonData + ' does not match the expected: ' + expected);
+      done();
+    });
   });
 
-  it('should continue a conversation', function(done) {
+  it('should make second call to Conversation', function(done) {
+    delete message.watsonData;
+    message.text = 'What can you do?';
+
     var expected = {
       "intents": [],
       "entities": [],
@@ -117,33 +132,17 @@ describe('conversation()', function() {
     };
 
     nock(service.url)
-      .persist()
       .post(path + '?version=' + service.version_date)
       .reply(200, expected);
 
-    utils.postMessage(conversation, {
-        workspace_id: workspace,
-        input: {
-          text: 'What can you do?'
-        },
-        context: {
-          "conversation_id": "8a79f4db-382c-4d56-bb88-1b320edf9eae",
-          "system": {
-            "dialog_stack": [
-              "root"
-            ],
-            "dialog_turn_counter": 1,
-            "dialog_request_counter": 1
-          }
-        }
-      },
-      function(err, response) {
-        if (err) {
-          return done(err);
-        }
-        assert.deepEqual(response, expected, 'Conversation response: ' + response + ' does not match expected response ' + expected);
-        done();
-      });
+    middleware.receive(bot, message, function(err, response) {
+      if (err) {
+        return done(err);
+      }
+      assert(message.watsonData, 'watsonData field missing in message!');
+      assert.deepEqual(message.watsonData, expected, 'Received Watson Conversation data: ' + message.watsonData + ' does not match the expected: ' + expected);
+      done();
+    });
   });
 
-});;
+});

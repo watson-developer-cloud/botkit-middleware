@@ -15,7 +15,7 @@
  */
 
 var assert = require('assert');
-var utils = require('../../lib/middleware/utils');
+var utils = require('../lib/middleware/utils');
 var Botkit = require('botkit');
 
 describe('context()', function() {

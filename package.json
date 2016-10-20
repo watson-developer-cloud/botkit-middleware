@@ -4,7 +4,8 @@
   "description": "A middleware for using Watson Conversation in a Botkit-powered bot.",
   "main": "lib/middleware/index.js",
   "scripts": {
-    "start": "node lib/middleware/index.js"
+    "start": "node lib/middleware/index.js",
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",
