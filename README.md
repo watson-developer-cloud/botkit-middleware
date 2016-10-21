@@ -94,7 +94,7 @@ middleware.before = function(message, conversationPayload, callback) {
 
 ### Hearing intents
 
-The Watson middleware also provides a `hears()` middleware provides a mechanism to
+The Watson middleware also includes a `hears()` middleware which provides a mechanism to
 developers to fire handler functions based on the most likely intent of the user.
 This allows a developer to create handler functions for specific intents in addition
 to using the data provided by Watson to power the conversation.
