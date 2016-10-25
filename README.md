@@ -92,6 +92,40 @@ middleware.before = function(message, conversationPayload, callback) {
   }
 ```
 
+### Hearing intents
+
+The Watson middleware also includes a `hears()` middleware which provides a mechanism to
+developers to fire handler functions based on the most likely intent of the user.
+This allows a developer to create handler functions for specific intents in addition
+to using the data provided by Watson to power the conversation.
+
+The `hears()` middleware can be used on individual handler functions, or can be used globally.
+
+Used on an individual handler:
+
+```js
+slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], watsonMiddleware.hear, function(bot, message) {
+
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+
+    // now do something special related to the hello intent
+
+});
+```
+
+Used globally:
+
+```js
+slackController.changeEars(watsonMiddleware.hear);
+
+slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+
+    // now do something special related to the hello intent
+});
+```
+
 This comes in handy to:
 - Make database updates
 - Update the context in the payload
