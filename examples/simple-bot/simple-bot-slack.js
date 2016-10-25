@@ -18,7 +18,12 @@ require('dotenv').load();
 
 var Botkit = require('botkit');
 var express = require('express');
-var middleware = require('botkit-middleware-watson');
+var middleware = require('botkit-middleware-watson')({
+  username: process.env.CONVERSATION_USERNAME,
+  password: process.env.CONVERSATION_PASSWORD,
+  workspace_id: process.env.WORKSPACE_ID,
+  version_date: '2016-09-20'
+});
 
 // Configure your bot.
 var slackController = Botkit.slackbot();
