@@ -19,8 +19,6 @@ var Botkit = require('botkit');
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 var nock = require('nock');
 
-var middleware = require('../lib/middleware/index');
-
 describe('conversation_turns()', function() {
 
   //Watson Conversation params
@@ -48,8 +46,9 @@ describe('conversation_turns()', function() {
     "team": "T2BM5DPJ6"
   };
 
-  middleware.conversation = new ConversationV1(service);
-  middleware.workspace = workspace_id;
+  var config = service;
+  config.workspace_id = workspace_id;
+  var middleware = require('../lib/middleware/index')(config);
 
   before(function() {
     nock.disableNetConnect();

@@ -49,7 +49,12 @@ var slackBot = slackController.spawn({
 
 Create the middleware object which you'll use to connect to the Conversation service:
 ```js
-var watsonMiddleware = require('botkit-middleware-watson');
+var watsonMiddleware = require('botkit-middleware-watson')({
+  username: YOUR_CONVERSATION_USERNAME,
+  password: YOUR_CONVERSATION_PASSWORD,
+  workspace_id: YOUR_WORKSPACE_ID,
+  version_date: '2016-09-20'
+});
 ```
 
 Tell your Slackbot to use the _watsonMiddleware_ for incoming messages:
@@ -70,11 +75,7 @@ Then you're all set!
 
 ### Using `before` and `after` functions
 
-The _before_ and _after_ callbacks are available through the Watson middleware object.
-
-```js
-var middleware = require('botkit-middleware-watson');
-```
+The _before_ and _after_ callbacks are available through the _watsonMiddleware_ object.
 
 These can be customized as follows:
 
