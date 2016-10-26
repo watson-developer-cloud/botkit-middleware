@@ -93,7 +93,6 @@ describe('conversation_turns()', function() {
       if (err) {
         return done(err);
       }
-      console.log(response);
       assert(message.watsonData, 'watsonData field missing in message!');
       assert.deepEqual(message.watsonData, expected, 'Received Watson Conversation data: ' + message.watsonData + ' does not match the expected: ' + expected);
       done();
