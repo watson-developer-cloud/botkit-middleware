@@ -12,6 +12,6 @@
     "botkit": "^0.2.2",
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
-    "botkit-middleware-watson": "^0.0.1"
+    "botkit-middleware-watson": "^1.0.0"
   }
 }
