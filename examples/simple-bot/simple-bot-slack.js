@@ -32,7 +32,9 @@ var slackBot = slackController.spawn({
 });
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   slackController.log('Slack message received');
-  bot.reply(message, message.watsonData.output.text.join('\n'));
+  middleware.interpret(bot, message, function(err, response) {
+		bot.reply(message, message.watsonData.output.text.join('\n'));
+	});
 });
 
 // Connect to Watson middleware
