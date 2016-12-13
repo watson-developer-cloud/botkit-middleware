@@ -73,34 +73,58 @@ The middleware attaches the `watsonData` object to _message_. This contains the 
 
 Then you're all set!
 
-### Using `before` and `after` functions
+### Middleware Functions
+The _watsonMiddleware_ object provides some useful functions which can be used for customizing the question-answering pipeline.
 
-The _before_ and _after_ callbacks are available through the _watsonMiddleware_ object.
+They come in handy to:
+- Respond to incoming messages
+- Make database updates
+- Update the context in the payload
+- Call some external service before/after calling Conversation
+- Filter out irrelevant intents by overwriting Botkit's hears function
 
-These can be customized as follows:
+#### `receive`
+The _receive_ function is the one which gets triggered on incoming bot messages. One needs to bind it to the Botkit's receive middleware in order for it to work.
 
 ```js
-middleware.before = function(message, conversationPayload, callback) {
-    // Code here gets executed before making the call to Conversation.
-    callback(null, customizedPayload);
-  }
+// Connect to Watson middleware
+slackController.middleware.receive.use(middleware.receive);
 ```
+
+Then simply respond to messages as follows:
+```js
+slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+  bot.reply(message, message.watsonData.output.text.join('\n'));
+});
+```
+
+Note: The receive function is triggered on _every_ message. Please consult the [Botkit's guide](https://github.com/howdyai/botkit#receive-middleware) to the receive middleware to know more about it.
+
+#### `interpret`
+
+The `interpret()` function works very similarly to the receive function but unlike the receive function,
+- it is not mapped to a Botkit function so doesn't need to be added as a middleware to Botkit
+- doesn't get triggered on all events
+
+The _interpret_ function only gets triggered when an event is _heard_ by the controller. For example, one might want your bot to only respond to _direct messages_ using Conversation. In such scenarios, one would use the interpret function as follows:
 
 ```js
-  middleware.after = function(message, conversationResponse, callback) {
-    // Code here gets executed after the call to Conversation.
-    callback(null, conversationResponse);
-  }
+slackController.hears(['.*'], ['direct_message'], function(bot, message) {
+  middleware.interpret(bot, message, function(err) {
+    if (!err)
+      bot.reply(message, message.watsonData.output.text.join('\n'));
+  });
+});
 ```
 
-### Hearing intents
+#### `hear`
 
-The Watson middleware also includes a `hears()` middleware which provides a mechanism to
+The Watson middleware also includes a `hear()` function which provides a mechanism to
 developers to fire handler functions based on the most likely intent of the user.
 This allows a developer to create handler functions for specific intents in addition
 to using the data provided by Watson to power the conversation.
 
-The `hears()` middleware can be used on individual handler functions, or can be used globally.
+The `hear()` function can be used on individual handler functions, or can be used globally.
 
 Used on an individual handler:
 
@@ -127,10 +151,24 @@ slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention']
 });
 ```
 
-This comes in handy to:
-- Make database updates
-- Update the context in the payload
-- Call some external service before/after calling Conversation
+#### `before` and `after`
+The _before_ and _after_ callbacks can be used to perform some tasks _before_ and _after_ Conversation is called. One may use it to modify the request/response payloads, execute business logic like accessing a database or making calls to external services.
+
+They can be customized as follows:
+
+```js
+middleware.before = function(message, conversationPayload, callback) {
+    // Code here gets executed before making the call to Conversation.
+    callback(null, customizedPayload);
+  }
+```
+
+```js
+  middleware.after = function(message, conversationResponse, callback) {
+    // Code here gets executed after the call to Conversation.
+    callback(null, conversationResponse);
+  }
+```
 
 ## License
 

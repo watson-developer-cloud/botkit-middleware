@@ -1,3 +1,11 @@
+## v1.1.0
+
+The following changes were introduced with the v1.1.0 release:
+
+ * Added `interpret` function to middleware. It is to be used when you need to send only _heard_ utterances to Watson.
+  Works like the receive function but needs to be explicitly called.
+
+
 ## Changes in v1.0.0
 
 The following changes were introduced with the v1.0.0 release:
