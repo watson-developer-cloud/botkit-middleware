@@ -32,8 +32,9 @@ var slackBot = slackController.spawn({
 });
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   slackController.log('Slack message received');
-  middleware.interpret(bot, message, function(err, response) {
-		bot.reply(message, response);
+  middleware.interpret(bot, message, function(err) {
+    if (!err)
+		  bot.reply(message, message.watsonData.output.text.join('\n'));
 	});
 });
 
