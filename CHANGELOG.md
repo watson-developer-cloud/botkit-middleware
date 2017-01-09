@@ -1,3 +1,10 @@
+## v1.2.0
+
+Fixed the invocation of after() in _receive_ and _interpret_. The order of invocation is now:
+ * before()
+ * conversation()
+ * after()
+
 ## v1.1.0
 
 The following changes were introduced with the v1.1.0 release:
