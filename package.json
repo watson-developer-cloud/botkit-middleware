@@ -1,6 +1,6 @@
 {
   "name": "botkit-middleware-watson",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A middleware for using Watson Conversation in a Botkit-powered bot.",
   "main": "lib/middleware/index.js",
   "scripts": {
