@@ -1,3 +1,7 @@
+## v1.3.0
+
+Fixed the parameters for the after() call in the interpret function.
+
 ## v1.2.0
 
 Fixed the invocation of after() in _receive_ and _interpret_. The order of invocation is now:
