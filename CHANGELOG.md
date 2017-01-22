@@ -1,3 +1,16 @@
+## v1.3.1
+
+Added minimum confidence like optional config parameter
+
+  ```javascript
+  var middleware = require('botkit-middleware-watson')({
+  username: process.env.CONVERSATION_USERNAME,
+  password: process.env.CONVERSATION_PASSWORD,
+  workspace_id: process.env.WORKSPACE_ID,
+  minimum_confidence: 0.50, // (Optional) Default is 0.75
+  });
+  ```
+
 ## v1.3.0
 
 Fixed the parameters for the after() call in the interpret function.
