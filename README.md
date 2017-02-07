@@ -54,7 +54,7 @@ var watsonMiddleware = require('botkit-middleware-watson')({
   password: YOUR_CONVERSATION_PASSWORD,
   workspace_id: YOUR_WORKSPACE_ID,
   version_date: '2016-09-20',
-  minimum_confidence: 0.50, // (Optional) Default is 0.75
+  minimum_confidence: 0.50 // (Optional) Default is 0.75
 });
 ```
 
