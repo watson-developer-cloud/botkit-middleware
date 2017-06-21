@@ -19,7 +19,7 @@ var Botkit = require('botkit');
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 var nock = require('nock');
 
-describe('conversation_turns()', function() {
+describe('receive()', function() {
 
   //Watson Conversation params
   var service = {

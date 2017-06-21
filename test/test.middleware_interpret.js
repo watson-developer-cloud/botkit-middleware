@@ -19,7 +19,7 @@ var Botkit = require('botkit');
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 var nock = require('nock');
 
-describe('conversation_turns()', function() {
+describe('interpret()', function() {
 
   //Watson Conversation params
   var service = {
@@ -89,7 +89,7 @@ describe('conversation_turns()', function() {
       .post(path + '?version=' + service.version_date)
       .reply(200, expected)
 
-    middleware.receive(bot, message, function(err, response) {
+    middleware.interpret(bot, message, function(err, response) {
       if (err) {
         return done(err);
       }
@@ -134,7 +134,7 @@ describe('conversation_turns()', function() {
       .post(path + '?version=' + service.version_date)
       .reply(200, expected);
 
-    middleware.receive(bot, message, function(err, response) {
+    middleware.interpret(bot, message, function(err, response) {
       if (err) {
         return done(err);
       }
