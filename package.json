@@ -23,8 +23,9 @@
   "devDependencies": {
     "assert": "^1.4.1",
     "botkit": "^0.2.2",
+    "mocha": "^3.1.0",
     "nock": "^8.1.0",
-    "mocha": "^3.1.0"
+    "sinon": "^2.3.5"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
