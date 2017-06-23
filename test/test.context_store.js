@@ -17,8 +17,9 @@
 var assert = require('assert');
 var utils = require('../lib/middleware/utils');
 var Botkit = require('botkit');
+var sinon = require('sinon');
 
-describe('context()', function() {
+describe('context', function() {
   var message = {
     "type": "message",
     "channel": "D2BQEJJ1X",
@@ -69,25 +70,47 @@ describe('context()', function() {
   });
   var storage = bot.botkit.storage;
 
-  it('should read context correctly', function() {
-    utils.readContext(message, storage, function(cb, context) {
-      assert.deepEqual(context, null, 'Actual context: ' + context + '\ndoes not match expected context: ' + null);
-    });
-  });
-
-  it('should update context correctly', function() {
-    var expected_store = {
-      "U2BLZSKFG": {
-        "id": "U2BLZSKFG",
-        "context": conversation_response.context
-      }
-    };
-    utils.updateContext(message.user, storage, conversation_response, function(cb, response) {
-      storage.users.all(function(err, data) {
-        assert.equal(err, null);
-        assert.deepEqual(data, expected_store, 'Updated store: ' + data + '\ndoes not match expected store: ' + expected_store);
+  describe('readContext()', function() {
+    it('should read context correctly', function () {
+      utils.readContext(message, storage, function (cb, context) {
+        assert.deepEqual(context, null, 'Actual context: ' + context + '\ndoes not match expected context: ' + null);
       });
     });
+
+    it('should handle storage error correctly', function () {
+      var storageStub = sinon.stub(storage.users, 'get').yields('error message');
+
+      utils.readContext(message, storage, function (err, context) {
+        assert.equal(err, 'error message', 'Error was not passed to callback');
+      });
+      storageStub.restore();
+    });
   });
 
-});;
+  describe('updateContext()', function() {
+    it('should update context correctly', function () {
+      var expected_store = {
+        "U2BLZSKFG": {
+          "id": "U2BLZSKFG",
+          "context": conversation_response.context
+        }
+      };
+      utils.updateContext(message.user, storage, conversation_response, function (cb, response) {
+        storage.users.all(function (err, data) {
+          assert.equal(err, null);
+          assert.deepEqual(data, expected_store, 'Updated store: ' + data + '\ndoes not match expected store: ' + expected_store);
+        });
+      });
+    });
+
+    it('should handle storage error correctly', function () {
+      var storageStub = sinon.stub(storage.users, 'save').yields('error message');
+
+      utils.updateContext(message.user, storage, conversation_response, function (err, context) {
+        assert.equal(err, 'error message', 'Error was not passed to callback');
+      });
+      storageStub.restore();
+    });
+  });
+
+});
