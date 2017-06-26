@@ -32,9 +32,13 @@ var slackBot = slackController.spawn({
 });
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   slackController.log('Slack message received');
-  middleware.interpret(bot, message, function(err) {
-    if (!err)
-		  bot.reply(message, message.watsonData.output.text.join('\n'));
+  middleware.interpret(bot, message, function() {
+    if (message.watsonError) {
+      bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+    } else {
+      bot.reply(message, message.watsonData.output.text.join('\n'));
+    }
+
 	});
 });
 
