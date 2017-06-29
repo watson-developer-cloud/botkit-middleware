@@ -12,6 +12,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 ## Function Overview
 * `receive`: used as [middleware in Botkit](#bot-setup).
 * `interpret`: an alias of `receive`, used in [message-filtering](#message-filtering) and [implementing app actions](#implementing-app-actions).
+* `sendToWatson`: another alias of `receive`, use the one that looks the best in context.
 * `hear`: used for [intent matching](#intent-matching).
 * `updateContext`: used in [implementing app actions](#implementing-app-actions).
 * `before`: [pre-process](#before-and-after) requests before sending to Watson Conversation (Conversation).
@@ -205,7 +206,7 @@ var processWatsonResponse = function (bot, message) {
         return watsonMiddleware.updateContextAsync(message.user, context);
       }).then(function () {
         //send message to watson (it reads updated context from storage)
-        return watsonMiddleware.interpretAsync(bot, newMessage);
+        return watsonMiddleware.sendToWatsonAsync(bot, newMessage);
       }).catch(function (error) {
         newMessage.watsonError = error;
       }).then(function () {
