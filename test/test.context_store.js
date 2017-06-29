@@ -77,11 +77,11 @@ describe('context', function() {
       });
     });
 
-    it('should handle storage error correctly', function () {
+    it('should suppress storage error', function () {
       var storageStub = sinon.stub(storage.users, 'get').yields('error message');
 
       utils.readContext(message, storage, function (err, context) {
-        assert.equal(err, 'error message', 'Error was not passed to callback');
+        assert.equal(err, null, 'Error was not suppressed');
       });
       storageStub.restore();
     });
