@@ -11,19 +11,19 @@ This document describes how to set up a sample Express app which talks to Slack,
 ## Getting credentials
 
 ### Watson Conversation
-Follow the steps outlined in [this document](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-application-environmnet) and paste your Conversation bot's credentials in the sample `.env` file in the project directory.
+Follow the steps outlined in [this document](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-app-environment) and paste your Conversation bot's credentials in the sample `.env` file in the project directory.
 
 If you don't have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
 
 ### Slack
-Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/readme-slack.md) from Botkit.
+Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/docs/readme-slack.md) from Botkit.
 Once you obtain the Slack token, paste the token in the `.env` file.
 ```
 SLACK_TOKEN=<your token>
 ```
 
 ### Facebook Messenger
-Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/readme-facebook.md) from Botkit.
+Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/docs/readme-facebook.md) from Botkit.
 
 *Some helpful hints for Facebook Messenger:*
  * Log into the Facebook App settings page. You need to add two Products- Messenger and Webhooks.
@@ -46,7 +46,7 @@ FB_APP_SECRET=<your apps secret key>
 When you're ready to test your bot, go to your Facebook homepage and find the page you created. Click on _Message_ to start chatting with your Watson Conversation bot!
 
 ### Twilio IPM
-Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/readme-twilioipm.md) from Botkit.
+Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/docs/readme-twilioipm.md) from Botkit.
 Copy and paste all the authentication details in the `.env` file.
 ```
 TWILIO_ACCOUNT_SID=<your account sid>

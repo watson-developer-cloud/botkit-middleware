@@ -36,7 +36,7 @@ You need a _Slack token_ for your Slack bot to talk to Conversation.
 
 If you have an existing Slack bot, then copy the Slack token from your Slack settings page.
 
-Otherwise, follow [Botkit's instructions](https://github.com/howdyai/botkit/blob/master/readme-slack.md) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
+Otherwise, follow [Botkit's instructions](https://github.com/howdyai/botkit/blob/master/docs/readme-slack.md) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
 
 ### Bot setup
 
