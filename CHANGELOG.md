@@ -1,3 +1,12 @@
+## v1.4.0
+
+The following changes were introduced with the v1.4.0 release:
+* Added `updateContext` function to middleware.
+* `interpret` is just an alias of `receive`.
+* `sendToWatson` is a new alias of `receive`.
+* Fixed error handling in `utils.updateContext`.
+* If any error happens in `receive`, it is assigned to `message.watsonError`
+
 ## v1.3.1
 
 Added minimum confidence like optional config parameter
@@ -44,4 +53,4 @@ The following changes were introduced with the v1.0.0 release:
   });
   ```
 
- * Added hears function to middleware
+ * Added `hears` function to middleware
