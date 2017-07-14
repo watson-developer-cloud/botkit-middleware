@@ -1,3 +1,8 @@
+## v1.4.1
+
+* `updateContext` actually preserves other data stored in users storage
+
+
 ## v1.4.0
 
 The following changes were introduced with the v1.4.0 release:

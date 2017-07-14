@@ -88,17 +88,17 @@ describe('context', function() {
   });
 
   describe('updateContext()', function() {
-    it('should update context correctly', function () {
-      var expected_store = {
+    it('should store context of the first response', function () {
+      var expectedStore = {
         "U2BLZSKFG": {
           "id": "U2BLZSKFG",
           "context": conversation_response.context
         }
       };
-      utils.updateContext(message.user, storage, conversation_response, function (cb, response) {
+      utils.updateContext(message.user, storage, conversation_response, function (err, response) {
         storage.users.all(function (err, data) {
           assert.equal(err, null);
-          assert.deepEqual(data, expected_store, 'Updated store: ' + data + '\ndoes not match expected store: ' + expected_store);
+          assert.deepEqual(data, expectedStore, 'Updated store: ' + data + '\ndoes not match expected store: ' + expectedStore);
         });
       });
     });
@@ -111,6 +111,75 @@ describe('context', function() {
       });
       storageStub.restore();
     });
-  });
 
+    it('should update existing context', function () {
+      var firstContext = {
+        "a": 1,
+        "b": 2
+      };
+      var secondContext = {
+        "c": 3,
+        "d": 4
+      };
+      var expectedStore = {
+        "U2BLZSKFG": {
+          "id": "U2BLZSKFG",
+          "context": secondContext
+        }
+      };
+      //first update
+      utils.updateContext(message.user, storage, {context: firstContext}, function (err, response) {
+        assert.ifError(err);
+        //second update
+        utils.updateContext(message.user, storage, {context: secondContext}, function (err, response) {
+          assert.ifError(err);
+
+          storage.users.all(function (err, data) {
+            assert.equal(err, null);
+            assert.deepEqual(data, expectedStore, 'Updated store: ' + data + '\ndoes not match expected store: ' + expectedStore);
+          });
+        });
+      });
+    });
+
+    it('should preserve other data in storage', function () {
+
+      var user = {
+        "id": message.user,
+        "profile": {
+          "age": 23,
+          "sex": "male"
+        }
+      };
+
+      var newContext = {
+        "a": 1,
+        "b": 2
+      };
+
+      var expectedStore = {
+        "U2BLZSKFG": {
+          "id": "U2BLZSKFG",
+          "profile": {
+            "age": 23,
+            "sex": "male",
+          },
+          "context": newContext
+        }
+      };
+
+      storage.users.save(user, function(err) {
+        assert.ifError(err);
+
+        utils.updateContext(message.user, storage, {context: newContext}, function (err, response) {
+          assert.ifError(err);
+
+          storage.users.all(function (err, data) {
+            assert.equal(err, null);
+            assert.deepEqual(data, expectedStore, 'Updated store: ' + data + '\ndoes not match expected store: ' + expectedStore);
+          });
+        });
+      });
+    });
+  });
 });
