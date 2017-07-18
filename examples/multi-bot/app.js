@@ -20,7 +20,8 @@ var middleware = require('botkit-middleware-watson')({
   username: process.env.CONVERSATION_USERNAME,
   password: process.env.CONVERSATION_PASSWORD,
   workspace_id: process.env.WORKSPACE_ID,
-  version_date: '2016-09-20'
+  url: process.env.CONVERSATION_URL || 'https://gateway.watsonplatform.net/conversation/api',
+  version_date: '2017-05-26'
 });
 
 module.exports = function(app) {
