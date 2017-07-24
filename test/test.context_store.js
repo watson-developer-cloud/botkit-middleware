@@ -103,13 +103,26 @@ describe('context', function() {
       });
     });
 
-    it('should handle storage error correctly', function () {
+    it('should ignore storage error on read when user is not saved yet', function () {
+      var storageStub1 = sinon.stub(storage.users, 'get').yields(new Error('error message'));
+      var storageStub2 = sinon.stub(storage.users, 'save').yields();
+
+      var watsonResponse = {context: {a: 1}};
+      utils.updateContext('NEWUSER3', storage, watsonResponse, function (err, response) {
+        assert.ifError(err);
+        assert.equal(response, watsonResponse);
+        storageStub1.restore();
+        storageStub2.restore();
+        });
+    });
+
+    it('should return storage error on write', function () {
       var storageStub = sinon.stub(storage.users, 'save').yields('error message');
 
       utils.updateContext(message.user, storage, conversation_response, function (err, context) {
         assert.equal(err, 'error message', 'Error was not passed to callback');
+        storageStub.restore();
       });
-      storageStub.restore();
     });
 
     it('should update existing context', function () {
