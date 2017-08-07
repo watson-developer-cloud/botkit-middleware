@@ -182,7 +182,7 @@ function checkBalance(context, callback) {
   //this version of function updates only the context object
   context.validAccount = true;
   context.accountBalance = 95.33;
-  callback(null, watsonResponse);
+  callback(null, context);
 }
 
 Promise.promisifyAll(watsonMiddleware);
