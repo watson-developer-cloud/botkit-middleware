@@ -23,6 +23,7 @@
   "devDependencies": {
     "assert": "^1.4.1",
     "botkit": "^0.2.2",
+    "clone": "^2.1.1",
     "mocha": "^3.4.2",
     "nock": "^8.2.1",
     "sinon": "^2.3.5"
@@ -30,6 +31,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "debug": "^2.6.8",
+    "deepmerge": "^1.5.1",
     "watson-developer-cloud": "^2.32.1"
   }
 }

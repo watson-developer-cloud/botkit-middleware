@@ -12,9 +12,9 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 ## Function Overview
 * `receive`: used as [middleware in Botkit](#bot-setup).
 * `interpret`: an alias of `receive`, used in [message-filtering](#message-filtering) and [implementing app actions](#implementing-app-actions).
-* `sendToWatson`: another alias of `receive`, use the one that looks the best in context.
+* `sendToWatson`: same as above, but it can update context before making request, used in [implementing app actions](#implementing-app-actions).
 * `hear`: used for [intent matching](#intent-matching).
-* `updateContext`: used in [implementing app actions](#implementing-app-actions).
+* `updateContext`: used in [implementing app actions](#implementing-app-actions) (sendToWatson does it better now).
 * `before`: [pre-process](#before-and-after) requests before sending to Watson Conversation (Conversation).
 * `after`: [post-process](#before-and-after) responses before forwarding them to Botkit.
 
@@ -128,33 +128,27 @@ A common scenario of processing actions is
 * Send message to Watson with updated context
 * Send result message(s) to user.
 
-#### Using middleware.after and controller
-Before v1.4.0 only middleware.after callback can update context, and only controller can send replies to user.
-The downside is that it is impossible to send "Please wait message".
-
+### using sendToWatson to update context (possible since v1.5.0)
+Using sendToWatson to update context simplifies the bot code compared to solution using updateContext below.
 ```js
-function checkBalance(watsonResponse, callback) {
-  //middleware.after function must pass a complete Watson respose to callback 
-  watsonResponse.context.validAccount = true;
-  watsonResponse.context.accountBalance = 95.33;
-  callback(null, watsonResponse);
+
+function checkBalance(context, callback) {
+  //do something real here
+
+  var contextDelta = {
+    validAccount: true,
+    accountBalance: 95.33
+  };
+  callback(null, context);
 }
 
-watsonMiddleware.after = function(message, watsonResponse, callback) {
-  //real action happens in middleware.after
-  if (typeof watsonResponse !== 'undefined' && typeof watsonResponse.output !== 'undefined') {
-    if (watsonResponse.output.action === 'check_balance') {
-      return checkBalance(watsonResponse, callback);
-    }
-  }
-  callback(null, watsonResponse);
-};
+Promise.promisifyAll(watsonMiddleware);
+var checkBalanceAsync = Promise.promisify(checkBalance);
 
-var processWatsonResponse = function(bot, message) {
+var processWatsonResponse = function (bot, message) {
   if (message.watsonError) {
     return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   }
-
   if (typeof message.watsonData.output !== 'undefined') {
     //send "Please wait" to users
     bot.reply(message, message.watsonData.output.text.join('\n'));
@@ -162,18 +156,21 @@ var processWatsonResponse = function(bot, message) {
     if (message.watsonData.output.action === 'check_balance') {
       var newMessage = clone(message);
       newMessage.text = 'balance result';
-      //send to watson
-      watsonMiddleware.interpret(bot, newMessage, function() {
-        //send results to user
-        processWatsonResponse(bot, newMessage);
+
+      checkBalanceAsync(message.watsonData.context).then(function (contextDelta) {
+        return watsonMiddleware.sendToWatsonAsync(bot, newMessage, contextDelta);
+      }).catch(function (error) {
+        newMessage.watsonError = error;
+      }).then(function () {
+        return processWatsonResponse(bot, newMessage);
       });
     }
   }
 };
 
 controller.on('message_received', processWatsonResponse);
-
 ```
+
 #### Using updateContext in controller (available since v1.4.0)
  Since 1.4.0 it is possible to update context from controller code.
 ```js
@@ -218,6 +215,53 @@ var processWatsonResponse = function (bot, message) {
 };
 
 controller.on('message_received', processWatsonResponse);
+```
+
+#### Using middleware.after and controller
+Before v1.4.0 only middleware.after callback can update context, and only controller can send replies to user.
+The downside is that it is impossible to send "Please wait message".
+
+```js
+function checkBalance(watsonResponse, callback) {
+  //middleware.after function must pass a complete Watson respose to callback
+  watsonResponse.context.validAccount = true;
+  watsonResponse.context.accountBalance = 95.33;
+  callback(null, watsonResponse);
+}
+
+watsonMiddleware.after = function(message, watsonResponse, callback) {
+  //real action happens in middleware.after
+  if (typeof watsonResponse !== 'undefined' && typeof watsonResponse.output !== 'undefined') {
+    if (watsonResponse.output.action === 'check_balance') {
+      return checkBalance(watsonResponse, callback);
+    }
+  }
+  callback(null, watsonResponse);
+};
+
+var processWatsonResponse = function(bot, message) {
+  if (message.watsonError) {
+    return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+  }
+
+  if (typeof message.watsonData.output !== 'undefined') {
+    //send "Please wait" to users
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+
+    if (message.watsonData.output.action === 'check_balance') {
+      var newMessage = clone(message);
+      newMessage.text = 'balance result';
+      //send to watson
+      watsonMiddleware.interpret(bot, newMessage, function() {
+        //send results to user
+        processWatsonResponse(bot, newMessage);
+      });
+    }
+  }
+};
+
+controller.on('message_received', processWatsonResponse);
+
 ```
 
 
