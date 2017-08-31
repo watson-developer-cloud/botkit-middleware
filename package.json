@@ -3,6 +3,7 @@
   "version": "1.4.2",
   "description": "A middleware for using Watson Conversation in a Botkit-powered bot.",
   "main": "lib/middleware/index.js",
+  "types": "lib/middleware/index.d.ts",
   "scripts": {
     "start": "node lib/middleware/index.js",
     "test": "mocha test"
