@@ -235,30 +235,25 @@ controller.on('facebook_postback', function(bot, message) {
 });
 ```
 Since they usually have no text, events aren't processed by middleware and have no watsonData attribute.
-If event handler wants to updateContext, it has to read it first.
+If event handler wants to make use of some data from context, it has to read it first.
 Example:
 ```js
 controller.on('facebook_postback', function(bot, message) {
-    watsonMiddleware.readContext(message.user, bot.botkit.storage, function(err, context) {
+    watsonMiddleware.readContext(message.user, function(err, context) {
         if (!context) {
             context = {};
         }
         //do something useful here
+        myFunction(context.field1, context.field2, function(err, result) {
+            const newMessage = clone(message);
+            newMessage.text = 'postback result';
 
-        context.postbackResult = 'success';
-
-        const newMessage = clone(message);
-        newMessage.text = 'postback result';
-
-        watsonMiddleware.updateContext(newMessage.user, context, function(err) {
-          if (err) {
-              newMessage.watsonError = error;
+            watsonMiddleware.sendToWatson(bot, newMessage, {postbackResult: 'success'}, function(err) {
+              if (err) {
+                  newMessage.watsonError = error;
+              }
               processWatsonResponse(bot, newMessage);
-              return;
-          }
-          watsonMiddleware.sendToWatson(bot, newMessage, function() {
-              processWatsonResponse(bot, newMessage);
-          });
+            });
         });
     });
 });
