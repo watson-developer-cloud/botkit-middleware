@@ -83,6 +83,7 @@ declare namespace WatsonMiddleware {
     sendToWatson: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, contextDelta: ContextDelta, next: () => void) => void;
     receive: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
     interpret: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
+    readContext: (user: string, callback: (err: string | Error | null, context ?: Context) => void) => void;
     updateContext: (user: string, context: Context, callback: (err: string | Error | null, watsonResponse ?: Data) => void) => void;
   }
 
