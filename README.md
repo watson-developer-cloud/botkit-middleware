@@ -14,6 +14,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 * `interpret`: an alias of `receive`, used in [message-filtering](#message-filtering) and [implementing app actions](#implementing-app-actions).
 * `sendToWatson`: another alias of `receive`, use the one that looks the best in context.
 * `hear`: used for [intent matching](#intent-matching).
+* `readContext`: used in [implementing event handlers](#implementing-event-handlers).
 * `updateContext`: used in [implementing app actions](#implementing-app-actions).
 * `before`: [pre-process](#before-and-after) requests before sending to Watson Conversation (Conversation).
 * `after`: [post-process](#before-and-after) responses before forwarding them to Botkit.
@@ -119,6 +120,7 @@ var receiveMiddleware = function (bot, message, next) {
 slackController.middleware.receive.use(receiveMiddleware);
 ```
 
+
 ### Implementing app actions
 Conversation side of app action is documented in [Developer Cloud](https://www.ibm.com/watson/developercloud/doc/conversation/develop-app.html#implementing-app-actions)
 A common scenario of processing actions is
@@ -218,6 +220,43 @@ var processWatsonResponse = function (bot, message) {
 };
 
 controller.on('message_received', processWatsonResponse);
+```
+
+
+## Implementing event handlers
+
+Events are messages having type different than `message`.
+
+[Example](https://github.com/howdyai/botkit/blob/master/examples/facebook_bot.js) of handler:
+```js
+controller.on('facebook_postback', function(bot, message) {
+   bot.reply(message, 'Great Choice!!!! (' + message.payload + ')');
+
+});
+```
+Since they usually have no text, events aren't processed by middleware and have no watsonData attribute.
+If event handler wants to make use of some data from context, it has to read it first.
+Example:
+```js
+controller.on('facebook_postback', function(bot, message) {
+    watsonMiddleware.readContext(message.user, function(err, context) {
+        if (!context) {
+            context = {};
+        }
+        //do something useful here
+        myFunction(context.field1, context.field2, function(err, result) {
+            const newMessage = clone(message);
+            newMessage.text = 'postback result';
+
+            watsonMiddleware.sendToWatson(bot, newMessage, {postbackResult: 'success'}, function(err) {
+              if (err) {
+                  newMessage.watsonError = error;
+              }
+              processWatsonResponse(bot, newMessage);
+            });
+        });
+    });
+});
 ```
 
 
