@@ -3,6 +3,7 @@
 This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Conversation](https://www.ibm.com/watson/developercloud/conversation.html) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
 
 ## Middleware Overview
+
 * Automatically manages context in multi-turn conversations to keep track of where the user left off in the conversation.
 * Allows greater flexibility in message handling.
 * Handles external databases for context storage.
@@ -10,23 +11,27 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 * Exposes the following functions to developers:
 
 ## Function Overview
+
 * `receive`: used as [middleware in Botkit](#bot-setup).
 * `interpret`: an alias of `receive`, used in [message-filtering](#message-filtering) and [implementing app actions](#implementing-app-actions).
-* `sendToWatson`: another alias of `receive`, use the one that looks the best in context.
+* `sendToWatson`: same as above, but it can update context before making request, used in [implementing app actions](#implementing-app-actions).
 * `hear`: used for [intent matching](#intent-matching).
+* `updateContext`: used in [implementing app actions](#implementing-app-actions) (sendToWatson does it better now).
 * `readContext`: used in [implementing event handlers](#implementing-event-handlers).
-* `updateContext`: used in [implementing app actions](#implementing-app-actions).
 * `before`: [pre-process](#before-and-after) requests before sending to Watson Conversation (Conversation).
 * `after`: [post-process](#before-and-after) responses before forwarding them to Botkit.
 
 
 ## Installation
+
 ```sh
 $ npm install botkit-middleware-watson --save
 ```
 
 ## Usage
+
 ### Acquire Watson Conversation credentials
+
 The middleware needs you to provide the `username`, `password`, and `workspace_id` of your Watson Conversation chat bot. If you have an existing Conversation service instance, follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-application-environmnet) to get your credentials.
 
 If you do not have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
@@ -52,7 +57,7 @@ var slackController = Botkit.slackbot();
 Spawn a Slack bot using the controller:
 ```js
 var slackBot = slackController.spawn({
-    token: YOUR_SLACK_TOKEN
+  token: YOUR_SLACK_TOKEN
 });
 ```
 
@@ -91,10 +96,12 @@ Then you're all set!
 ## Features
 
 ### Message filtering
+
 When middleware is registered, the receive function is triggered on _every_ message.
 If you would like to make your bot to only respond to _direct messages_ using Conversation, you can achieve this in 2 ways:
 
 #### Using interpret function instead of registering middleware
+
 ```js
 slackController.hears(['.*'], ['direct_message'], function(bot, message) {
   middleware.interpret(bot, message, function() {
@@ -108,6 +115,7 @@ slackController.hears(['.*'], ['direct_message'], function(bot, message) {
 ```
 
 #### Using middleware wrapper
+
 ```js
 var receiveMiddleware = function (bot, message, next) {
   if (message.type === 'direct_message') {
@@ -122,6 +130,7 @@ slackController.middleware.receive.use(receiveMiddleware);
 
 
 ### Implementing app actions
+
 Conversation side of app action is documented in [Developer Cloud](https://www.ibm.com/watson/developercloud/doc/conversation/develop-app.html#implementing-app-actions)
 A common scenario of processing actions is
 * Send message to user "Please wait while I ..."
@@ -130,33 +139,28 @@ A common scenario of processing actions is
 * Send message to Watson with updated context
 * Send result message(s) to user.
 
-#### Using middleware.after and controller
-Before v1.4.0 only middleware.after callback can update context, and only controller can send replies to user.
-The downside is that it is impossible to send "Please wait message".
+### using sendToWatson to update context (possible since v1.5.0)
 
+Using sendToWatson to update context simplifies the bot code compared to solution using updateContext below.
 ```js
-function checkBalance(watsonResponse, callback) {
-  //middleware.after function must pass a complete Watson respose to callback 
-  watsonResponse.context.validAccount = true;
-  watsonResponse.context.accountBalance = 95.33;
-  callback(null, watsonResponse);
+
+function checkBalance(context, callback) {
+  //do something real here
+
+  var contextDelta = {
+    validAccount: true,
+    accountBalance: 95.33
+  };
+  callback(null, context);
 }
 
-watsonMiddleware.after = function(message, watsonResponse, callback) {
-  //real action happens in middleware.after
-  if (typeof watsonResponse !== 'undefined' && typeof watsonResponse.output !== 'undefined') {
-    if (watsonResponse.output.action === 'check_balance') {
-      return checkBalance(watsonResponse, callback);
-    }
-  }
-  callback(null, watsonResponse);
-};
+Promise.promisifyAll(watsonMiddleware);
+var checkBalanceAsync = Promise.promisify(checkBalance);
 
-var processWatsonResponse = function(bot, message) {
+var processWatsonResponse = function (bot, message) {
   if (message.watsonError) {
     return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   }
-
   if (typeof message.watsonData.output !== 'undefined') {
     //send "Please wait" to users
     bot.reply(message, message.watsonData.output.text.join('\n'));
@@ -164,20 +168,24 @@ var processWatsonResponse = function(bot, message) {
     if (message.watsonData.output.action === 'check_balance') {
       var newMessage = clone(message);
       newMessage.text = 'balance result';
-      //send to watson
-      watsonMiddleware.interpret(bot, newMessage, function() {
-        //send results to user
-        processWatsonResponse(bot, newMessage);
+
+      checkBalanceAsync(message.watsonData.context).then(function (contextDelta) {
+        return watsonMiddleware.sendToWatsonAsync(bot, newMessage, contextDelta);
+      }).catch(function (error) {
+        newMessage.watsonError = error;
+      }).then(function () {
+        return processWatsonResponse(bot, newMessage);
       });
     }
   }
 };
 
 controller.on('message_received', processWatsonResponse);
-
 ```
+
 #### Using updateContext in controller (available since v1.4.0)
- Since 1.4.0 it is possible to update context from controller code.
+
+Since 1.4.0 it is possible to update context from controller code.
 ```js
 
 function checkBalance(context, callback) {
@@ -222,6 +230,54 @@ var processWatsonResponse = function (bot, message) {
 controller.on('message_received', processWatsonResponse);
 ```
 
+#### Using middleware.after and controller
+
+Before v1.4.0 only middleware.after callback can update context, and only controller can send replies to user.
+The downside is that it is impossible to send "Please wait message".
+
+```js
+function checkBalance(watsonResponse, callback) {
+  //middleware.after function must pass a complete Watson respose to callback
+  watsonResponse.context.validAccount = true;
+  watsonResponse.context.accountBalance = 95.33;
+  callback(null, watsonResponse);
+}
+
+watsonMiddleware.after = function(message, watsonResponse, callback) {
+  //real action happens in middleware.after
+  if (typeof watsonResponse !== 'undefined' && typeof watsonResponse.output !== 'undefined') {
+    if (watsonResponse.output.action === 'check_balance') {
+      return checkBalance(watsonResponse, callback);
+    }
+  }
+  callback(null, watsonResponse);
+};
+
+var processWatsonResponse = function(bot, message) {
+  if (message.watsonError) {
+    return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+  }
+
+  if (typeof message.watsonData.output !== 'undefined') {
+    //send "Please wait" to users
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+
+    if (message.watsonData.output.action === 'check_balance') {
+      var newMessage = clone(message);
+      newMessage.text = 'balance result';
+      //send to watson
+      watsonMiddleware.interpret(bot, newMessage, function() {
+        //send results to user
+        processWatsonResponse(bot, newMessage);
+      });
+    }
+  }
+};
+
+controller.on('message_received', processWatsonResponse);
+
+```
+
 
 ## Implementing event handlers
 
@@ -230,8 +286,7 @@ Events are messages having type different than `message`.
 [Example](https://github.com/howdyai/botkit/blob/master/examples/facebook_bot.js) of handler:
 ```js
 controller.on('facebook_postback', function(bot, message) {
-   bot.reply(message, 'Great Choice!!!! (' + message.payload + ')');
-
+ bot.reply(message, 'Great Choice!!!! (' + message.payload + ')');
 });
 ```
 Since they usually have no text, events aren't processed by middleware and have no watsonData attribute.
@@ -239,23 +294,23 @@ If event handler wants to make use of some data from context, it has to read it 
 Example:
 ```js
 controller.on('facebook_postback', function(bot, message) {
-    watsonMiddleware.readContext(message.user, function(err, context) {
-        if (!context) {
-            context = {};
-        }
-        //do something useful here
-        myFunction(context.field1, context.field2, function(err, result) {
-            const newMessage = clone(message);
-            newMessage.text = 'postback result';
+  watsonMiddleware.readContext(message.user, function(err, context) {
+    if (!context) {
+      context = {};
+    }
+    //do something useful here
+    myFunction(context.field1, context.field2, function(err, result) {
+      const newMessage = clone(message);
+      newMessage.text = 'postback result';
 
-            watsonMiddleware.sendToWatson(bot, newMessage, {postbackResult: 'success'}, function(err) {
-              if (err) {
-                  newMessage.watsonError = error;
-              }
-              processWatsonResponse(bot, newMessage);
-            });
-        });
+      watsonMiddleware.sendToWatson(bot, newMessage, {postbackResult: 'success'}, function(err) {
+        if (err) {
+          newMessage.watsonError = error;
+        }
+        processWatsonResponse(bot, newMessage);
+      });
     });
+  });
 });
 ```
 
@@ -273,11 +328,8 @@ Used on an individual handler:
 
 ```js
 slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], watsonMiddleware.hear, function(bot, message) {
-
-    bot.reply(message, message.watsonData.output.text.join('\n'));
-
-    // now do something special related to the hello intent
-
+  bot.reply(message, message.watsonData.output.text.join('\n'));
+  // now do something special related to the hello intent
 });
 ```
 
@@ -287,23 +339,22 @@ Used globally:
 slackController.changeEars(watsonMiddleware.hear);
 
 slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
-
-    bot.reply(message, message.watsonData.output.text.join('\n'));
-
-    // now do something special related to the hello intent
+  bot.reply(message, message.watsonData.output.text.join('\n'));
+  // now do something special related to the hello intent
 });
 ```
 
 #### `before` and `after`
+
 The _before_ and _after_ callbacks can be used to perform some tasks _before_ and _after_ Conversation is called. One may use it to modify the request/response payloads, execute business logic like accessing a database or making calls to external services.
 
 They can be customized as follows:
 
 ```js
-  middleware.before = function(message, conversationPayload, callback) {
-    // Code here gets executed before making the call to Conversation.
-    callback(null, customizedPayload);
-  }
+middleware.before = function(message, conversationPayload, callback) {
+  // Code here gets executed before making the call to Conversation.
+  callback(null, customizedPayload);
+}
 ```
 
 ```js
