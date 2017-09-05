@@ -87,7 +87,7 @@ describe('receive()', function() {
     };
     nock(service.url)
       .post(path + '?version=' + service.version_date)
-      .reply(200, expected)
+      .reply(200, expected);
 
     middleware.receive(bot, message, function(err, response) {
       if (err) {
@@ -143,5 +143,56 @@ describe('receive()', function() {
       done();
     });
   });
+
+  it('should pass empty welcome message to Conversation', function(done) {
+    var expected = {
+      "intents": [],
+      "entities": [],
+      "input": {
+        "text": "hi"
+      },
+      "output": {
+        "log_messages": [],
+        "text": [
+          "Hello from Watson Conversation!"
+        ],
+        "nodes_visited": [
+          "node_1_1467221909631"
+        ]
+      },
+      "context": {
+        "conversation_id": "8a79f4db-382c-4d56-bb88-1b320edf9eae",
+        "system": {
+          "dialog_stack": [
+            "root"
+          ],
+          "dialog_turn_counter": 1,
+          "dialog_request_counter": 1
+        }
+      }
+    };
+    nock(service.url)
+      .post(path + '?version=' + service.version_date)
+      .reply(200, expected);
+
+    var welcomeMessage = {
+      "type": "welcome",
+      "channel": "D2BQEJJ1X",
+      "user": "U2BLZSKFG",
+      "text": "",
+      "ts": "1475776074.000004",
+      "team": "T2BM5DPJ6"
+    };
+
+    middleware.receive(bot, welcomeMessage, function(err, response) {
+      if (err) {
+        return done(err);
+      }
+      assert(welcomeMessage.watsonData, 'watsonData field missing in message!');
+      assert.deepEqual(welcomeMessage.watsonData, expected, 'Received Watson Conversation data: ' + welcomeMessage.watsonData + ' does not match the expected: ' + expected);
+      done();
+    });
+  });
+
 
 });
