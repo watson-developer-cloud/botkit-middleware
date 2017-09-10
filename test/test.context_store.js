@@ -71,9 +71,9 @@ describe('context', function() {
   var storage = bot.botkit.storage;
 
   describe('readContext()', function() {
-    it('should read context correctly', function () {
+    it('should return empty object if user is not found in storage', function () {
       utils.readContext(message, storage, function (cb, context) {
-        assert.deepEqual(context, null, 'Actual context: ' + context + '\ndoes not match expected context: ' + null);
+        assert.deepEqual(context, {});
       });
     });
 

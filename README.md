@@ -295,9 +295,7 @@ Example:
 ```js
 controller.on('facebook_postback', function(bot, message) {
   watsonMiddleware.readContext(message.user, function(err, context) {
-    if (!context) {
-      context = {};
-    }
+
     //do something useful here
     myFunction(context.field1, context.field2, function(err, result) {
       const newMessage = clone(message);
