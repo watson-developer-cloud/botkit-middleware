@@ -81,10 +81,13 @@ declare namespace WatsonMiddleware {
     before: (message: botkit.Message, payload: Payload, callback: (err: string | Error, payload: Payload) => void) => void;
     after: (message: botkit.Message, response, callback) => void;
     sendToWatson: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, contextDelta: ContextDelta, next: () => void) => void;
+    sendToWatson: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, contextDelta: ContextDelta) => Promise<void>;
     receive: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
     interpret: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
     readContext: (user: string, callback: (err: string | Error | null, context ?: Context) => void) => void;
+    readContext: (user: string) => Promise<Context>;
     updateContext: (user: string, context: Context, callback: (err: string | Error | null, watsonResponse ?: Data) => void) => void;
+    updateContext: (user: string, context: Context) => Promise<Data>;
   }
 
   interface Payload {
