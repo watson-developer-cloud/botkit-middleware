@@ -154,7 +154,6 @@ function checkBalance(context, callback) {
   callback(null, context);
 }
 
-Promise.promisifyAll(watsonMiddleware);
 var checkBalanceAsync = Promise.promisify(checkBalance);
 
 var processWatsonResponse = function (bot, message) {
@@ -170,7 +169,7 @@ var processWatsonResponse = function (bot, message) {
       newMessage.text = 'balance result';
 
       checkBalanceAsync(message.watsonData.context).then(function (contextDelta) {
-        return watsonMiddleware.sendToWatsonAsync(bot, newMessage, contextDelta);
+        return watsonMiddleware.sendToWatson(bot, newMessage, contextDelta);
       }).catch(function (error) {
         newMessage.watsonError = error;
       }).then(function () {
@@ -195,7 +194,6 @@ function checkBalance(context, callback) {
   callback(null, context);
 }
 
-Promise.promisifyAll(watsonMiddleware);
 var checkBalanceAsync = Promise.promisify(checkBalance);
 
 var processWatsonResponse = function (bot, message) {
@@ -213,10 +211,10 @@ var processWatsonResponse = function (bot, message) {
       //check balance
       checkBalanceAsync(message.watsonData.context).then(function (context) {
         //update context in storage
-        return watsonMiddleware.updateContextAsync(message.user, context);
+        return watsonMiddleware.updateContext(message.user, context);
       }).then(function () {
         //send message to watson (it reads updated context from storage)
-        return watsonMiddleware.sendToWatsonAsync(bot, newMessage);
+        return watsonMiddleware.sendToWatson(bot, newMessage);
       }).catch(function (error) {
         newMessage.watsonError = error;
       }).then(function () {
@@ -295,9 +293,7 @@ Example:
 ```js
 controller.on('facebook_postback', function(bot, message) {
   watsonMiddleware.readContext(message.user, function(err, context) {
-    if (!context) {
-      context = {};
-    }
+
     //do something useful here
     myFunction(context.field1, context.field2, function(err, result) {
       const newMessage = clone(message);
