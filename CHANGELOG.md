@@ -1,3 +1,14 @@
+## v1.6.0
+
+* New methods sendToWatsonAsync, interpretAsync, readContextAsync, updateContextAsync return promises.
+
+## v1.5.0
+
+* Exported readContext method.
+* sendToWatson method can update context.
+* Added Typescript definition.
+* Empty message with type=welcome can be used to indicate welcome event.
+
 ## v1.4.2
 
 Fixed critical issue introduced in v1.4.1:  
@@ -49,7 +60,7 @@ The following changes were introduced with the v1.1.0 release:
   Works like the receive function but needs to be explicitly called.
 
 
-## Changes in v1.0.0
+## v1.0.0
 
 The following changes were introduced with the v1.0.0 release:
 
