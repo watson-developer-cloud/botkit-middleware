@@ -154,7 +154,6 @@ function checkBalance(context, callback) {
   callback(null, context);
 }
 
-Promise.promisifyAll(watsonMiddleware);
 var checkBalanceAsync = Promise.promisify(checkBalance);
 
 var processWatsonResponse = function (bot, message) {
@@ -195,7 +194,6 @@ function checkBalance(context, callback) {
   callback(null, context);
 }
 
-Promise.promisifyAll(watsonMiddleware);
 var checkBalanceAsync = Promise.promisify(checkBalance);
 
 var processWatsonResponse = function (bot, message) {
