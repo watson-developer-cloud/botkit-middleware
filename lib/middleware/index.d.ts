@@ -1,4 +1,5 @@
-import * as botkit from "botkit";
+import * as Botkit from "botkit";
+import Bluebird = require("bluebird");
 
 declare module 'botkit' {
   interface Message {
@@ -73,9 +74,9 @@ declare namespace WatsonMiddleware {
     minimum_confidence: number,
     conversation: any;
     storage: {
-      users: botkit.Storage<botkit.User>;
-      channels: botkit.Storage<botkit.Channel>;
-      teams: botkit.Storage<botkit.Team>;
+      users: Botkit.Storage<Botkit.User>;
+      channels: Botkit.Storage<Botkit.Channel>;
+      teams: Botkit.Storage<Botkit.Team>;
     };
     hear: (patterns: string[], message: botkit.Message) => boolean;
     before: (message: botkit.Message, payload: Payload, callback: (err: string | Error, payload: Payload) => void) => void;
@@ -85,6 +86,10 @@ declare namespace WatsonMiddleware {
     interpret: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
     readContext: (user: string, callback: (err: string | Error | null, context ?: Context) => void) => void;
     updateContext: (user: string, context: Context, callback: (err: string | Error | null, watsonResponse ?: Data) => void) => void;
+    sendToWatsonAsync: (bot: Botkit.Bot<any, Botkit.Message>, message: Botkit.Message, contextDelta: ContextDelta) => Bluebird<void>;
+    interpretAsync: (bot: Botkit.Bot<any, Botkit.Message>, message: Botkit.Message) => Bluebird<void>;
+    readContextAsync: (user: string) => Bluebird<Context>;
+    updateContextAsync: (user: string, context: Context) => Bluebird<Data>;
   }
 
   interface Payload {
