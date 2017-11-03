@@ -1,3 +1,7 @@
+## v1.6.1
+
+* Fixed function signatures in Typescript definition file
+
 ## v1.6.0
 
 * New methods sendToWatsonAsync, interpretAsync, readContextAsync, updateContextAsync return promises.
