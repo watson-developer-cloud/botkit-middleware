@@ -78,12 +78,12 @@ declare namespace WatsonMiddleware {
       channels: Botkit.Storage<Botkit.Channel>;
       teams: Botkit.Storage<Botkit.Team>;
     };
-    hear: (patterns: string[], message: botkit.Message) => boolean;
-    before: (message: botkit.Message, payload: Payload, callback: (err: string | Error, payload: Payload) => void) => void;
-    after: (message: botkit.Message, response, callback) => void;
-    sendToWatson: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, contextDelta: ContextDelta, next: () => void) => void;
-    receive: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
-    interpret: (bot: botkit.Bot<any, botkit.Message>, message: botkit.Message, next: () => void) => void;
+    hear: (patterns: string[], message: Botkit.Message) => boolean;
+    before: (message: Botkit.Message, payload: Payload, callback: (err: string | Error, payload: Payload) => void) => void;
+    after: (message: Botkit.Message, response, callback) => void;
+    sendToWatson: (bot: Botkit.Bot<any, Botkit.Message>, message: Botkit.Message, contextDelta: ContextDelta, next: () => void) => void;
+    receive: (bot: Botkit.Bot<any, Botkit.Message>, message: Botkit.Message, next: () => void) => void;
+    interpret: (bot: Botkit.Bot<any, Botkit.Message>, message: Botkit.Message, next: () => void) => void;
     readContext: (user: string, callback: (err: string | Error | null, context ?: Context) => void) => void;
     updateContext: (user: string, context: Context, callback: (err: string | Error | null, watsonResponse ?: Data) => void) => void;
     sendToWatsonAsync: (bot: Botkit.Bot<any, Botkit.Message>, message: Botkit.Message, contextDelta: ContextDelta) => Bluebird<void>;
