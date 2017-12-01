@@ -59,7 +59,7 @@ describe('receive()', function() {
   });
 
   it('should make first call to Conversation', function(done) {
-    var expected = {
+    var expectedWatsonData = {
       "intents": [],
       "entities": [],
       "input": {
@@ -87,14 +87,14 @@ describe('receive()', function() {
     };
     nock(service.url)
       .post(path + '?version=' + service.version_date)
-      .reply(200, expected);
+      .reply(200, expectedWatsonData);
 
     middleware.receive(bot, message, function(err, response) {
       if (err) {
         return done(err);
       }
       assert(message.watsonData, 'watsonData field missing in message!');
-      assert.deepEqual(message.watsonData, expected, 'Received Watson Conversation data: ' + message.watsonData + ' does not match the expected: ' + expected);
+      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
       done();
     });
   });
@@ -103,7 +103,7 @@ describe('receive()', function() {
     delete message.watsonData;
     message.text = 'What can you do?';
 
-    var expected = {
+    var expectedWatsonData = {
       "intents": [],
       "entities": [],
       "input": {
@@ -132,20 +132,20 @@ describe('receive()', function() {
 
     nock(service.url)
       .post(path + '?version=' + service.version_date)
-      .reply(200, expected);
+      .reply(200, expectedWatsonData);
 
     middleware.receive(bot, message, function(err, response) {
       if (err) {
         return done(err);
       }
       assert(message.watsonData, 'watsonData field missing in message!');
-      assert.deepEqual(message.watsonData, expected, 'Received Watson Conversation data: ' + message.watsonData + ' does not match the expected: ' + expected);
+      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
       done();
     });
   });
 
   it('should pass empty welcome message to Conversation', function(done) {
-    var expected = {
+    var expectedWatsonData = {
       "intents": [],
       "entities": [],
       "input": {
@@ -173,7 +173,7 @@ describe('receive()', function() {
     };
     nock(service.url)
       .post(path + '?version=' + service.version_date)
-      .reply(200, expected);
+      .reply(200, expectedWatsonData);
 
     var welcomeMessage = {
       "type": "welcome",
@@ -189,10 +189,57 @@ describe('receive()', function() {
         return done(err);
       }
       assert(welcomeMessage.watsonData, 'watsonData field missing in message!');
-      assert.deepEqual(welcomeMessage.watsonData, expected, 'Received Watson Conversation data: ' + welcomeMessage.watsonData + ' does not match the expected: ' + expected);
+      assert.deepEqual(welcomeMessage.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(welcomeMessage.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
       done();
     });
   });
 
+  it('should replace not-permitted characters in message text', function (done) {
+    delete message.watsonData;
+    // text can not contain the following characters: tab, new line, carriage return.
+    message.text = 'What\tcan\tyou\r\ndo?';
+    var expectedMessage = 'What can you  do?'
 
+    var expectedWatsonData = {
+      "intents": [],
+      "entities": [],
+      "input": {
+        "text": expectedMessage
+      },
+      "output": {
+        "log_messages": [],
+        "text": [
+          "I can tell you about myself. I have a charming personality!"
+        ],
+        "nodes_visited": [
+          "node_3_1467221909631"
+        ]
+      },
+      "context": {
+        "conversation_id": "8a79f4db-382c-4d56-bb88-1b320edf9eae",
+        "system": {
+          "dialog_stack": [
+            "root"
+          ],
+          "dialog_turn_counter": 2,
+          "dialog_request_counter": 2
+        }
+      }
+    };
+
+    var watsonMock = nock(service.url)
+      .post(path + '?version=' + service.version_date, function (body) {
+        return body.input.text === expectedMessage;
+      }).reply(200, expectedWatsonData);
+
+    middleware.receive(bot, message, function(err, response) {
+      if (err) {
+        return done(err);
+      }
+      watsonMock.done();
+      assert(message.watsonData, 'watsonData field missing in message!');
+      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
+      done();
+    });
+  });
 });
