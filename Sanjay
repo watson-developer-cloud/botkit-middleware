@@ -5,8 +5,6 @@ var controller = Botkit.slackbot({
   clientSecret: process.env.clientSecret,
   studio_token: process.env.studio_token,
 });
-Include Botkit into your Node application and boot up a controller that will define your bot's behaviors. In this case, we're setting up a bot for Slack.
-
 controller.setupWebserver(process.env.port,function(err,webserver) {
     controller.createWebhookEndpoints(controller.webserver);
     controller.createOauthEndpoints(controller.webserver);
