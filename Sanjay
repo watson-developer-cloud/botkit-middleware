@@ -1,0 +1,18 @@
+var Botkit = require('botkit');
+
+var controller = Botkit.slackbot({
+  clientId: process.env.clientId,
+  clientSecret: process.env.clientSecret,
+  studio_token: process.env.studio_token,
+});
+controller.setupWebserver(process.env.port,function(err,webserver) {
+    controller.createWebhookEndpoints(controller.webserver);
+    controller.createOauthEndpoints(controller.webserver);
+});
+Set up a simple webserver so that Botkit can receive incoming messages via webhook.
+
+controller.hears('hello','direct_mention,direct_message', function(bot, message) {
+
+  bot.reply(message,'Howdy!');
+
+});
