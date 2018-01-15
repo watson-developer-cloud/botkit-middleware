@@ -218,4 +218,66 @@ describe('sendToWatson()', function() {
       });
     });
   });
+
+  it('should make request to different workspace, if workspace_id is set in context', function (done) {
+    var newWorkspaceId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+
+    var expectedPath = '/v1/workspaces/' + newWorkspaceId + '/message';
+
+    var storedContext = {
+      workspace_id: newWorkspaceId
+    };
+
+    var expectedContextInResponse = clone(storedContext);
+    expectedContextInResponse.conversation_id = "8a79f4db-382c-4d56-bb88-1b320edf9eae",
+      expectedContextInResponse.system = {
+        dialog_stack: [
+          "root"
+        ],
+        dialog_turn_counter: 1,
+        dialog_request_counter: 1
+      };
+
+    var expectedRequest = {
+      input: {
+        text: message.text
+      },
+      context: storedContext
+    };
+
+    var mockedWatsonResponse = {
+      "intents": [],
+      "entities": [],
+      "input": {
+        "text": "hi"
+      },
+      "output": {
+        "log_messages": [],
+        "text": [
+          "Hello from Watson Conversation!"
+        ],
+        "nodes_visited": [
+          "node_1_1467221909631"
+        ]
+      },
+      "context": expectedContextInResponse
+    };
+
+    //verify request and return mocked response
+    var mockedRequest = nock(service.url)
+      .post(expectedPath + '?version=' + service.version_date, expectedRequest)
+      .reply(200, mockedWatsonResponse);
+
+    utils.updateContext(message.user, bot.botkit.storage, {context: storedContext}, function(err) {
+      assert.ifError(err);
+
+      middleware.sendToWatson(bot, message, function(err, response) {
+        assert.ifError(err);
+        assert.ifError(message.watsonError);
+
+        mockedRequest.done();
+        done();
+      });
+    });
+  })
 });

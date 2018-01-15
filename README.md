@@ -362,6 +362,30 @@ middleware.before = function(message, conversationPayload, callback) {
   }
 ```
 
+#### Dynamic workspace
+
+If you need to make use of multiple workspaces in a single bot, workspace_id can be changed dynamically by setting workspace_id property in context.
+
+Example of setting workspace_id to id provided as a property of hello message:
+```js
+function handleHelloEvent(bot, message) {
+    message.type = 'welcome';
+    var contextDelta = {};
+
+    if (message.workspaceId) {
+        contextDelta.workspace_id = message.workspaceId;
+    }
+
+    watsonMiddleware.sendToWatsonAsync(bot, message, contextDelta).catch(function (error) {
+        message.watsonError = error;
+    }).then(function () {
+        bot.reply(message, message.watsonData.output.text.join('\n'));
+    });
+}
+
+controller.on('hello', handleHelloEvent);
+```
+
 ## License
 
 This library is licensed under Apache 2.0. Full license text is available in [LICENSE](LICENSE).
