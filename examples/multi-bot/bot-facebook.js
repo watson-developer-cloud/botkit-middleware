@@ -25,7 +25,7 @@ var bot = controller.spawn();
 controller.hears('(.*)', 'message_received', function(bot, message) {
   if (message.watsonData && message.watsonData.output) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
-  else if (message.watsonError) {
+  } else if (message.watsonError) {
     console.log(message.watsonError);
     bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   } else {
