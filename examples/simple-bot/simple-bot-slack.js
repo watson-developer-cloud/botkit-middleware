@@ -33,14 +33,14 @@ var slackBot = slackController.spawn({
 });
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   slackController.log('Slack message received');
-  middleware.interpret(bot, message, function() {   
-    if (message.watsonData && message.watsonData.output) {
-      bot.reply(message, message.watsonData.output.text.join('\n'));
-    } else if (message.watsonError) {
+  middleware.interpret(bot, message, function() {
+    if (message.watsonError) {
       console.log(message.watsonError);
       bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+    } else if (message.watsonData && message.watsonData.output) {
+      bot.reply(message, message.watsonData.output.text.join('\n'));
     } else {
-      console.log("Error: received message in unknown format. (Is Watson Conversation up and running?)");
+      console.log('Error: received message in unknown format. (Is your connection with Watson Conversation up and running?)');
       bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
     }
   });
