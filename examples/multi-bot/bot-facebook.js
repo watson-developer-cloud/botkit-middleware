@@ -26,7 +26,7 @@ controller.hears('(.*)', 'message_received', function(bot, message) {
   if (message.watsonError) {
     console.log(message.watsonError);
     bot.reply(message, message.watsonError.description || message.watsonError.error);
-  } else if (message.watsonData && message.watsonData.output) {
+  } else if (message.watsonData && 'output' in message.watsonData) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
   } else {
     console.log('Error: received message in unknown format. (Is your connection with Watson Conversation up and running?)');
