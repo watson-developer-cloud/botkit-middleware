@@ -27,7 +27,15 @@ var bot = controller.spawn({
   autojoin: true
 });
 controller.hears(['.*'], 'message_received', function(bot, message) {
-  bot.reply(message, message.watsonData.output.text.join('\n'));
+  if (message.watsonError) {
+    console.log(message.watsonError);
+    bot.reply(message, message.watsonError.description || message.watsonError.error);
+  } else if (message.watsonData && 'output' in message.watsonData) {
+    bot.reply(message, message.watsonData.output.text.join('\n'));
+  } else {
+    console.log('Error: received message in unknown format. (Is your connection with Watson Conversation up and running?)');
+    bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+  }
 });
 
 module.exports.controller = controller;
