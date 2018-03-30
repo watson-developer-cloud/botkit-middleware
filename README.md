@@ -157,7 +157,7 @@ You can find the default implementation of this function [here](https://github.c
 controller.changeEars(watsonMiddleware.hear)
 ```
 
-Note: if you want your own `hear()` function to implement pattern matching like Botkit's default one, you will likely need to implement that yourself. Botkit's default set of 'ears' is the `hears_regexp` function which is implemented [here].(https://github.com/howdyai/botkit/blob/77b7d7f80c46d5c8194453667d22118b7850e252/lib/CoreBot.js#L1180)
+Note: if you want your own `hear()` function to implement pattern matching like Botkit's default one, you will likely need to implement that yourself. Botkit's default set of 'ears' is the `hears_regexp` function which is implemented [here](https://github.com/howdyai/botkit/blob/77b7d7f80c46d5c8194453667d22118b7850e252/lib/CoreBot.js#L1180).
 
 ### Implementing app actions
 
