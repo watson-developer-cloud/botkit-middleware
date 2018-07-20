@@ -17,11 +17,11 @@
 require('dotenv').load();
 
 var middleware = require('botkit-middleware-watson')({
-  username: process.env.CONVERSATION_USERNAME,
-  password: process.env.CONVERSATION_PASSWORD,
+  username: process.env.ASSISTANT_USERNAME,
+  password: process.env.ASSISTANT_PASSWORD,
   workspace_id: process.env.WORKSPACE_ID,
-  url: process.env.CONVERSATION_URL || 'https://gateway.watsonplatform.net/conversation/api',
-  version_date: '2017-05-26'
+  url: process.env.ASSISTANT_URL || 'https://gateway.watsonplatform.net/assistant/api',
+  version: '2018-07-10'
 });
 
 module.exports = function(app) {
@@ -44,11 +44,11 @@ module.exports = function(app) {
     console.log('Twilio bot is live');
   }
   // Customize your Watson Middleware object's before and after callbacks.
-  middleware.before = function(message, conversationPayload, callback) {
-    callback(null, conversationPayload);
-  }
+  middleware.before = function(message, assistantPayload, callback) {
+    callback(null, assistantPayload);
+  };
 
-  middleware.after = function(message, conversationResponse, callback) {
-    callback(null, conversationResponse);
-  }
+  middleware.after = function(message, assistantResponse, callback) {
+    callback(null, assistantResponse);
+  };
 };

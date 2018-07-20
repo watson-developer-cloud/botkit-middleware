@@ -21,10 +21,10 @@ var crypto = require('crypto');
  * https://developers.facebook.com/docs/graph-api/webhooks
  */
 module.exports = function verifyFacebookSignatureHeader(req, res, buf) {
-  var signature = req.headers["x-hub-signature"];
+  var signature = req.headers['x-hub-signature'];
 
   if (!signature) {
-    console.log("Signature absent in the request: %s", JSON.stringify(req));
+    console.log('Signature absent in the request: %s', JSON.stringify(req));
   } else {
     // Get the facebook signature
     var elements = signature.split('sha1=');
@@ -35,7 +35,7 @@ module.exports = function verifyFacebookSignatureHeader(req, res, buf) {
       .digest('hex');
 
     if (facebookSignature !== expectedSignature) {
-      throw new Error("Could not verify message was sent from Facebook.");
+      throw new Error('Could not verify message was sent from Facebook.');
     }
   }
-}
+};

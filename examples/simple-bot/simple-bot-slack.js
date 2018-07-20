@@ -19,11 +19,11 @@ require('dotenv').load();
 var Botkit = require('botkit');
 var express = require('express');
 var middleware = require('botkit-middleware-watson')({
-  username: process.env.CONVERSATION_USERNAME,
-  password: process.env.CONVERSATION_PASSWORD,
+  username: process.env.ASSISTANT_USERNAME,
+  password: process.env.ASSISTANT_PASSWORD,
   workspace_id: process.env.WORKSPACE_ID,
-  url: process.env.CONVERSATION_URL || 'https://gateway.watsonplatform.net/conversation/api',
-  version_date: '2017-05-26'
+  url: process.env.ASSISTANT_URL || 'https://gateway.watsonplatform.net/assistant/api',
+  version: '2018-07-10'
 });
 
 // Configure your bot.
@@ -41,7 +41,7 @@ slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], f
       bot.reply(message, message.watsonData.output.text.join('\n'));
     } else {
       console.log('Error: received message in unknown format. (Is your connection with Watson Conversation up and running?)');
-      bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+      bot.reply(message, 'I\'m sorry, but for technical reasons I can\'t respond to your message');
     }
   });
 });

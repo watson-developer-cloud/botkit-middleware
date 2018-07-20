@@ -1,3 +1,9 @@
+## v1.8.0
+
+* Added semantic-releases
+* Update node-sdk to 3.7.0
+* Update to use the Watson Assistant class
+
 ## v1.6.1
 
 * Fixed function signatures in Typescript definition file

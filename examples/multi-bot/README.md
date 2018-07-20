@@ -10,10 +10,45 @@ This document describes how to set up a sample Express app which talks to Slack,
 
 ## Getting credentials
 
-### Watson Conversation
-Follow the steps outlined in [this document](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-app-environment) and paste your Conversation bot's credentials in the sample `.env` file in the project directory.
+### Watson Assistant
 
-If you don't have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
+1. Sign up for an [IBM Cloud account](https://console.bluemix.net/registration/).
+1. Download the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/index.html#overview).
+1. Create an instance of the Watson Assistant service and get your credentials:
+    - Go to the [Watson Assistant](https://console.bluemix.net/catalog/services/conversation) page in the IBM Cloud Catalog.
+    - Log in to your IBM Cloud account.
+    - Click **Create**.
+    - Click **Show** to view the service credentials.
+    - Copy the `apikey` value, or copy the `username` and `password` values if your service instance doesn't provide an `apikey`.
+    - Copy the `url` value.
+
+1. Create a workspace using the Watson Assistant service and copy the `workspace_id`.
+
+1. Open the *.env* file and add the service credentials that you obtained in the previous step.
+
+    Example *.env* file that configures the `apikey` and `url` for a Watson Assistant service instance hosted in the US East region:
+
+    ```
+    ASSISTANT_IAM_APIKEY=X4rbi8vwZmKpXfowaS3GAsA7vdy17Qh7km5D6EzKLHL2
+    ASSISTANT_URL=https://gateway-wdc.watsonplatform.net/assistant/api
+    ```
+
+    - If your service instance uses `username` and `password` credentials, add the `ASSISTANT_USERNAME` and `ASSISTANT_PASSWORD` variables to the *.env* file.
+
+    Example *.env* file that configures the `username`, `password`, and `url` for a Watson Assistant service instance hosted in the US South region:
+
+    ```
+    ASSISTANT_USERNAME=522be-7b41-ab44-dec3-g1eab2ha73c6
+    ASSISTANT_PASSWORD=A4Z5BdGENrwu8
+    ASSISTANT_URL=https://gateway.watsonplatform.net/assistant/api
+    ```
+
+1. Add the `WORKSPACE_ID` to the previous properties
+
+    ```
+    WORKSPACE_ID=522be-7b41-ab44-dec3-g1eab2ha73c6
+    ```
+
 
 ### Slack
 Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/docs/readme-slack.md) from Botkit.
@@ -43,7 +78,7 @@ FB_VERIFY_TOKEN=<your verify token>
 FB_APP_SECRET=<your apps secret key>
 ```
 
-When you're ready to test your bot, go to your Facebook homepage and find the page you created. Click on _Message_ to start chatting with your Watson Conversation bot!
+When you're ready to test your bot, go to your Facebook homepage and find the page you created. Click on _Message_ to start chatting with your Watson Assistant bot!
 
 ### Twilio IPM
 Follow the Getting Started section of this [document](https://github.com/howdyai/botkit/blob/master/docs/readme-twilioipm.md) from Botkit.
