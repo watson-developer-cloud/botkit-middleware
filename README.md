@@ -152,6 +152,36 @@ var receiveMiddleware = function (bot, message, next) {
 slackController.middleware.receive.use(receiveMiddleware);
 ```
 
+### Minimum Confidence
+
+To use the setup parameter `minimum_confidence`, you have multiple options:
+
+#### Use it manually in your self-defined controller.hears() function(s)
+
+For example:
+```js
+controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention', 'message_received'], function(bot, message) {
+  if (message.watsonError) {
+    bot.reply(message, "Sorry, there are technical problems.");     // deal with watson error
+  } else {
+    if (message.watsonData.intents.length == 0) {
+      bot.reply(message, "Sorry, I could not understand the message.");     // was any intent recognized?
+    } else if (message.watsonData.intents[0].confidence < watsonMiddleware.minimum_confidence) {
+      bot.reply(message, "Sorry, I am not sure what you have said.");      // is the confidence high enough?
+    } else {
+      bot.reply(message, message.watsonData.output.text.join('\n'));      // reply with Watson response
+    }
+  }
+});
+```
+
+#### Use the middleware's hear() function
+You can find the default implementation of this function [here](https://github.com/watson-developer-cloud/botkit-middleware/blob/e29b002f2a004f6df57ddf240a3fdf8cb28f95d0/lib/middleware/index.js#L40). If you want, you can redefine this function in the same way that watsonMiddleware.before and watsonMiddleware.after can be redefined. Refer to the [Botkit Middleware documentation](https://github.com/howdyai/botkit/blob/master/docs/middleware.md#hear-middleware) for an example. Then, to use this function instead of Botkit's default pattern matcher (that does not use minimum_confidence), plug it in using:
+```js
+controller.changeEars(watsonMiddleware.hear)
+```
+
+Note: if you want your own `hear()` function to implement pattern matching like Botkit's default one, you will likely need to implement that yourself. Botkit's default set of 'ears' is the `hears_regexp` function which is implemented [here](https://github.com/howdyai/botkit/blob/77b7d7f80c46d5c8194453667d22118b7850e252/lib/CoreBot.js#L1180).
 
 ### Implementing app actions
 
