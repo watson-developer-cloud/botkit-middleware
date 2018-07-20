@@ -1,6 +1,6 @@
-# Use IBM Watson's Conversation service to chat with your Botkit-powered Bot! [![Build Status](https://travis-ci.org/watson-developer-cloud/botkit-middleware.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/botkit-middleware)
+# Use IBM Watson's Assistant service to chat with your Botkit-powered Bot! [![Build Status](https://travis-ci.org/watson-developer-cloud/botkit-middleware.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/botkit-middleware)
 
-This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Conversation](https://www.ibm.com/watson/developercloud/conversation.html) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
+This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Assistant](https://www.ibm.com/watson/services/conversation/) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
 
 ## Middleware Overview
 
@@ -18,7 +18,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 * `hear`: used for [intent matching](#intent-matching).
 * `updateContext`: used in [implementing app actions](#implementing-app-actions) (sendToWatson does it better now).
 * `readContext`: used in [implementing event handlers](#implementing-event-handlers).
-* `before`: [pre-process](#before-and-after) requests before sending to Watson Conversation (Conversation).
+* `before`: [pre-process](#before-and-after) requests before sending to Watson Assistant (Conversation).
 * `after`: [post-process](#before-and-after) responses before forwarding them to Botkit.
 
 
@@ -28,18 +28,26 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 $ npm install botkit-middleware-watson --save
 ```
 
-## Usage
+## Prerequisites
 
-### Acquire Watson Conversation credentials
+1. Sign up for an [IBM Cloud account](https://console.bluemix.net/registration/).
+1. Download the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/index.html#overview).
+1. Create an instance of the Watson Assistant service and get your credentials:
+    - Go to the [Watson Assistant](https://console.bluemix.net/catalog/services/conversation) page in the IBM Cloud Catalog.
+    - Log in to your IBM Cloud account.
+    - Click **Create**.
+    - Click **Show** to view the service credentials.
+    - Copy the `apikey` value, or copy the `username` and `password` values if your service instance doesn't provide an `apikey`.
+    - Copy the `url` value.
 
-The middleware needs you to provide the `username`, `password`, and `workspace_id` of your Watson Conversation chat bot. If you have an existing Conversation service instance, follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#configuring-the-application-environmnet) to get your credentials.
+1. Create a workspace using the Watson Assistant service and copy the `workspace_id`.
 
-If you do not have a Conversation service instance,  follow [these steps](https://github.com/watson-developer-cloud/conversation-simple/blob/master/README.md#before-you-begin) to get started.
 
 ### Acquire channel credentials
-This document shows code snippets for using a Slack bot with the middleware. (If you want examples for the other channels, see the [examples/multi-bot](/examples/multi-bot) folder. The multi-bot example app shows how to connect to Slack, Facebook, and Twilio IPM bots running on a single Express server.)
+This document shows code snippets for using a Slack bot with the middleware. (If you want examples for the other channels, see the [examples/multi-bot](/examples/multi-bot) folder.
+The multi-bot example app shows how to connect to Slack, Facebook, and Twilio IPM bots running on a single Express server.)
 
-You need a _Slack token_ for your Slack bot to talk to Conversation.
+You need a _Slack token_ for your Slack bot to talk to Watson Assistant.
 
 If you have an existing Slack bot, then copy the Slack token from your Slack settings page.
 
@@ -61,13 +69,29 @@ var slackBot = slackController.spawn({
 });
 ```
 
-Create the middleware object which you'll use to connect to the Conversation service:
+Create the middleware object which you'll use to connect to the Watson Assistant service.
+
+If your credentials are `username` and `password` use:
+
 ```js
 var watsonMiddleware = require('botkit-middleware-watson')({
-  username: YOUR_CONVERSATION_USERNAME,
-  password: YOUR_CONVERSATION_PASSWORD,
+  username: YOUR_ASSISTANT_USERNAME,
+  password: YOUR_ASSISTANT_PASSWORD,
+  url: YOUR_ASSISTANT_URL,
   workspace_id: YOUR_WORKSPACE_ID,
-  version_date: '2017-05-26',
+  version: '2018-07-10',
+  minimum_confidence: 0.50, // (Optional) Default is 0.75
+});
+```
+
+If your credentials is `apikey` use:
+
+```js
+var watsonMiddleware = require('botkit-middleware-watson')({
+  iam_apikey: YOUR_API_KEY,
+  url: YOUR_ASSISTANT_URL,
+  workspace_id: YOUR_WORKSPACE_ID,
+  version: '2018-07-10',
   minimum_confidence: 0.50, // (Optional) Default is 0.75
 });
 ```
@@ -98,7 +122,7 @@ Then you're all set!
 ### Message filtering
 
 When middleware is registered, the receive function is triggered on _every_ message.
-If you would like to make your bot to only respond to _direct messages_ using Conversation, you can achieve this in 2 ways:
+If you would like to make your bot to only respond to _direct messages_ using Assistant, you can achieve this in 2 ways:
 
 #### Using interpret function instead of registering middleware
 
@@ -131,7 +155,7 @@ slackController.middleware.receive.use(receiveMiddleware);
 
 ### Implementing app actions
 
-Conversation side of app action is documented in [Developer Cloud](https://www.ibm.com/watson/developercloud/doc/conversation/develop-app.html#implementing-app-actions)
+Watson Assistant side of app action is documented in [Developer Cloud](https://console.bluemix.net/docs/services/conversation/develop-app.html#building-a-client-application)
 A common scenario of processing actions is
 * Send message to user "Please wait while I ..."
 * Perform action
@@ -344,21 +368,21 @@ slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention']
 
 #### `before` and `after`
 
-The _before_ and _after_ callbacks can be used to perform some tasks _before_ and _after_ Conversation is called. One may use it to modify the request/response payloads, execute business logic like accessing a database or making calls to external services.
+The _before_ and _after_ callbacks can be used to perform some tasks _before_ and _after_ Assistant is called. One may use it to modify the request/response payloads, execute business logic like accessing a database or making calls to external services.
 
 They can be customized as follows:
 
 ```js
-middleware.before = function(message, conversationPayload, callback) {
-  // Code here gets executed before making the call to Conversation.
+middleware.before = function(message, assistantPayload, callback) {
+  // Code here gets executed before making the call to Assistant.
   callback(null, customizedPayload);
 }
 ```
 
 ```js
-  middleware.after = function(message, conversationResponse, callback) {
-    // Code here gets executed after the call to Conversation.
-    callback(null, conversationResponse);
+  middleware.after = function(message, assistantResponse, callback) {
+    // Code here gets executed after the call to Assistant.
+    callback(null, assistantResponse);
   }
 ```
 

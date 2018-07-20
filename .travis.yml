@@ -1,10 +1,22 @@
 language: node_js
-sudo: false
-node_js: 6
+sudo: true
+node_js: 8
 cache:
   directories:
     - node_modules
 script:
+  - npm run lint
   - npm test
-notifications:
-  email: false
+deploy:
+- provider: script
+  skip_cleanup: true
+  script:
+  - bx-blue-green-travis
+  on:
+    branch: master
+    repo: watson-developer-cloud/botkit-middleware
+- provider: script
+  skip_cleanup: true
+  script: npx semantic-release
+  on:
+    node: 8
