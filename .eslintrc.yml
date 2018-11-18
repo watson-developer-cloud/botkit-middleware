@@ -1,7 +1,10 @@
 env:
+  es6: true
   node: true
   mocha: true
 extends: 'eslint:recommended'
+parserOptions:
+  ecmaVersion: 2016
 rules:
   indent:
     - error
@@ -16,4 +19,4 @@ rules:
     - error
     - always
   no-console:
-    - off
+    - warn

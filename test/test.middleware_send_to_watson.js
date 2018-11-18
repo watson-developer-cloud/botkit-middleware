@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-var assert = require('assert');
-var Botkit = require('botkit');
-var nock = require('nock');
-var utils = require('../lib/middleware/utils');
-var clone = require('clone');
+const assert = require('assert');
+const Botkit = require('botkit');
+const nock = require('nock');
+const utils = require('../lib/middleware/utils');
+const clone = require('clone');
 
 describe('sendToWatson()', function () {
 
-  //Watson Conversation params
-  var service = {
+  //Watson Assistant params
+  const service = {
     username: 'batman',
     password: 'bruce-wayne',
     url: 'http://ibm.com:80',
     version: '2018-07-10'
   };
-  var workspace_id = 'zyxwv-54321';
-  var path = '/v1/workspaces/' + workspace_id + '/message';
+  const workspace_id = 'zyxwv-54321';
+  const path = '/v1/workspaces/' + workspace_id + '/message';
 
   // Botkit params
-  var controller = Botkit.slackbot();
-  var bot = controller.spawn({
+  const controller = Botkit.slackbot({ clientSigningSecret: 'slackSuperSecret' });
+  const bot = controller.spawn({
     token: 'abc123'
   });
-  var message = {
+  const message = {
     'type': 'message',
     'channel': 'D2BQEJJ1X',
     'user': 'U2BLZSKFG',
@@ -46,9 +46,9 @@ describe('sendToWatson()', function () {
     'team': 'T2BM5DPJ6'
   };
 
-  var config = service;
+  const config = service;
   config.workspace_id = workspace_id;
-  var middleware = require('../lib/middleware/index')(config);
+  const middleware = require('../lib/middleware/index')(config);
 
   before(function () {
     nock.disableNetConnect();
@@ -59,7 +59,7 @@ describe('sendToWatson()', function () {
   });
 
   it('should update context if contextDelta is provided', function (done) {
-    var storedContext = {
+    const storedContext = {
       a: 1,
       b: 'string',
       c: {
@@ -72,7 +72,7 @@ describe('sendToWatson()', function () {
       }
     };
 
-    var contextDelta = {
+    const contextDelta = {
       b: null,
       j: 'new string',
       c: {
@@ -83,7 +83,7 @@ describe('sendToWatson()', function () {
       }
     };
 
-    var expectedContextInRequest = {
+    const expectedContextInRequest = {
       a: 1,
       b: null,
       c: {
@@ -98,8 +98,8 @@ describe('sendToWatson()', function () {
       j: 'new string'
     };
 
-    var expectedContextInResponse = clone(expectedContextInRequest);
-    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae',
+    const expectedContextInResponse = clone(expectedContextInRequest);
+    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae';
     expectedContextInResponse.system = {
       dialog_stack: [
         'root'
@@ -108,14 +108,14 @@ describe('sendToWatson()', function () {
       dialog_request_counter: 1
     };
 
-    var expectedRequest = {
+    const expectedRequest = {
       input: {
         text: message.text
       },
       context: expectedContextInRequest
     };
 
-    var mockedWatsonResponse = {
+    const mockedWatsonResponse = {
       'intents': [],
       'entities': [],
       'input': {
@@ -124,7 +124,7 @@ describe('sendToWatson()', function () {
       'output': {
         'log_messages': [],
         'text': [
-          'Hello from Watson Conversation!'
+          'Hello from Watson Assistant!'
         ],
         'nodes_visited': [
           'node_1_1467221909631'
@@ -154,7 +154,7 @@ describe('sendToWatson()', function () {
   });
 
   it('should work if contextDelta parameter is missing for backwards compatibility', function (done) {
-    var storedContext = {
+    const storedContext = {
       a: 1,
       b: 'string',
       c: {
@@ -167,8 +167,8 @@ describe('sendToWatson()', function () {
       }
     };
 
-    var expectedContextInResponse = clone(storedContext);
-    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae',
+    const expectedContextInResponse = clone(storedContext);
+    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae';
     expectedContextInResponse.system = {
       dialog_stack: [
         'root'
@@ -177,14 +177,14 @@ describe('sendToWatson()', function () {
       dialog_request_counter: 1
     };
 
-    var expectedRequest = {
+    const expectedRequest = {
       input: {
         text: message.text
       },
       context: storedContext
     };
 
-    var mockedWatsonResponse = {
+    const mockedWatsonResponse = {
       'intents': [],
       'entities': [],
       'input': {
@@ -193,7 +193,7 @@ describe('sendToWatson()', function () {
       'output': {
         'log_messages': [],
         'text': [
-          'Hello from Watson Conversation!'
+          'Hello from Watson Assistant!'
         ],
         'nodes_visited': [
           'node_1_1467221909631'
@@ -223,16 +223,16 @@ describe('sendToWatson()', function () {
   });
 
   it('should make request to different workspace, if workspace_id is set in context', function (done) {
-    var newWorkspaceId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+    const newWorkspaceId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
 
-    var expectedPath = '/v1/workspaces/' + newWorkspaceId + '/message';
+    const expectedPath = '/v1/workspaces/' + newWorkspaceId + '/message';
 
-    var storedContext = {
+    const storedContext = {
       workspace_id: newWorkspaceId
     };
 
-    var expectedContextInResponse = clone(storedContext);
-    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae',
+    const expectedContextInResponse = clone(storedContext);
+    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae';
     expectedContextInResponse.system = {
       dialog_stack: [
         'root'
@@ -241,14 +241,14 @@ describe('sendToWatson()', function () {
       dialog_request_counter: 1
     };
 
-    var expectedRequest = {
+    const expectedRequest = {
       input: {
         text: message.text
       },
       context: storedContext
     };
 
-    var mockedWatsonResponse = {
+    const mockedWatsonResponse = {
       'intents': [],
       'entities': [],
       'input': {
@@ -257,7 +257,7 @@ describe('sendToWatson()', function () {
       'output': {
         'log_messages': [],
         'text': [
-          'Hello from Watson Conversation!'
+          'Hello from Watson Assistant!'
         ],
         'nodes_visited': [
           'node_1_1467221909631'
@@ -267,7 +267,7 @@ describe('sendToWatson()', function () {
     };
 
     //verify request and return mocked response
-    var mockedRequest = nock(service.url)
+    const mockedRequest = nock(service.url)
       .post(expectedPath + '?version=' + service.version, expectedRequest)
       .reply(200, mockedWatsonResponse);
 
