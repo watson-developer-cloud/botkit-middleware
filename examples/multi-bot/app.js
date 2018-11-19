@@ -17,8 +17,7 @@
 require('dotenv').load();
 
 var middleware = require('botkit-middleware-watson')({
-  username: process.env.ASSISTANT_USERNAME,
-  password: process.env.ASSISTANT_PASSWORD,
+  iam_apikey: process.env.ASSISTANT_IAM_APIKEY,
   workspace_id: process.env.WORKSPACE_ID,
   url: process.env.ASSISTANT_URL || 'https://gateway.watsonplatform.net/assistant/api',
   version: '2018-07-10'

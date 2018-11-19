@@ -33,7 +33,7 @@ controller.hears(['.*'], 'message_received', function(bot, message) {
   } else if (message.watsonData && 'output' in message.watsonData) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
   } else {
-    console.log('Error: received message in unknown format. (Is your connection with Watson Conversation up and running?)');
+    console.log('Error: received message in unknown format. (Is your connection with Watson Assistant up and running?)');
     bot.reply(message, 'I\'m sorry, but for technical reasons I can\'t respond to your message');
   }
 });

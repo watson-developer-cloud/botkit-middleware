@@ -21,9 +21,8 @@
 
 ## v1.4.2
 
-Fixed critical issue introduced in v1.4.1:  
-updateContext fails on first write for a new user when simple storage is used  
-(It happens because simple storage returns an error when record does not exist).
+ * Fixed critical issue introduced in v1.4.1
+ * updateContext fails on first write for a new user when simple storage is used (It happens because simple storage returns an error when record does not exist).
 
 ## v1.4.1
 

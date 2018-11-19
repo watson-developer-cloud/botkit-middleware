@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-var assert = require('assert');
-var Botkit = require('botkit');
-var nock = require('nock');
+const assert = require('assert');
+const Botkit = require('botkit');
+const nock = require('nock');
 
 describe('receive()', function () {
 
   //Watson Assistant params
-  var service = {
+  const service = {
     username: 'batman',
     password: 'bruce-wayne',
     url: 'http://ibm.com:80',
     version: '2018-07-10'
   };
-  var workspace_id = 'zyxwv-54321';
-  var path = '/v1/workspaces/' + workspace_id + '/message';
+  const workspace_id = 'zyxwv-54321';
+  const path = '/v1/workspaces/' + workspace_id + '/message';
 
   // Botkit params
-  var controller = Botkit.slackbot();
-  var bot = controller.spawn({
+  const controller = Botkit.slackbot({ clientSigningSecret: 'slackSuperSecret' });
+  const bot = controller.spawn({
     token: 'abc123'
   });
-  var message = {
+  const message = {
     'type': 'message',
     'channel': 'D2BQEJJ1X',
     'user': 'U2BLZSKFG',
@@ -44,9 +44,9 @@ describe('receive()', function () {
     'team': 'T2BM5DPJ6'
   };
 
-  var config = service;
+  const config = service;
   config.workspace_id = workspace_id;
-  var middleware = require('../lib/middleware/index')(config);
+  const middleware = require('../lib/middleware/index')(config);
 
   before(function () {
     nock.disableNetConnect();
@@ -57,7 +57,7 @@ describe('receive()', function () {
   });
 
   it('should make first call to Assistant', function (done) {
-    var expectedWatsonData = {
+    const expectedWatsonData = {
       'intents': [],
       'entities': [],
       'input': {
@@ -101,7 +101,7 @@ describe('receive()', function () {
     delete message.watsonData;
     message.text = 'What can you do?';
 
-    var expectedWatsonData = {
+    const expectedWatsonData = {
       'intents': [],
       'entities': [],
       'input': {
@@ -137,13 +137,13 @@ describe('receive()', function () {
         return done(err);
       }
       assert(message.watsonData, 'watsonData field missing in message!');
-      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
+      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Assistant data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
       done();
     });
   });
 
-  it('should pass empty welcome message to Conversation', function (done) {
-    var expectedWatsonData = {
+  it('should pass empty welcome message to Assistant', function (done) {
+    const expectedWatsonData = {
       'intents': [],
       'entities': [],
       'input': {
@@ -152,7 +152,7 @@ describe('receive()', function () {
       'output': {
         'log_messages': [],
         'text': [
-          'Hello from Watson Conversation!'
+          'Hello from Watson Assistant!'
         ],
         'nodes_visited': [
           'node_1_1467221909631'
@@ -173,7 +173,7 @@ describe('receive()', function () {
       .post(path + '?version=' + service.version)
       .reply(200, expectedWatsonData);
 
-    var welcomeMessage = {
+    const welcomeMessage = {
       'type': 'welcome',
       'channel': 'D2BQEJJ1X',
       'user': 'U2BLZSKFG',
@@ -187,7 +187,7 @@ describe('receive()', function () {
         return done(err);
       }
       assert(welcomeMessage.watsonData, 'watsonData field missing in message!');
-      assert.deepEqual(welcomeMessage.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(welcomeMessage.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
+      assert.deepEqual(welcomeMessage.watsonData, expectedWatsonData, 'Received Watson Assistant data: ' + JSON.stringify(welcomeMessage.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
       done();
     });
   });
@@ -196,9 +196,9 @@ describe('receive()', function () {
     delete message.watsonData;
     // text can not contain the following characters: tab, new line, carriage return.
     message.text = 'What\tcan\tyou\r\ndo?';
-    var expectedMessage = 'What can you  do?';
+    const expectedMessage = 'What can you  do?';
 
-    var expectedWatsonData = {
+    const expectedWatsonData = {
       'intents': [],
       'entities': [],
       'input': {
@@ -225,7 +225,7 @@ describe('receive()', function () {
       }
     };
 
-    var watsonMock = nock(service.url)
+    const watsonMock = nock(service.url)
       .post(path + '?version=' + service.version, function (body) {
         return body.input.text === expectedMessage;
       }).reply(200, expectedWatsonData);
@@ -236,7 +236,7 @@ describe('receive()', function () {
       }
       watsonMock.done();
       assert(message.watsonData, 'watsonData field missing in message!');
-      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Conversation data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
+      assert.deepEqual(message.watsonData, expectedWatsonData, 'Received Watson Assistant data: ' + JSON.stringify(message.watsonData) + ' does not match the expected: ' + JSON.stringify(expectedWatsonData));
       done();
     });
   });

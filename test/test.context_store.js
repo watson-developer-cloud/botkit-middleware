@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-var assert = require('assert');
-var utils = require('../lib/middleware/utils');
-var Botkit = require('botkit');
-var sinon = require('sinon');
+const assert = require('assert');
+const utils = require('../lib/middleware/utils');
+const Botkit = require('botkit');
+const sinon = require('sinon');
 
 describe('context', function () {
-  var message = {
+  const message = {
     'type': 'message',
     'channel': 'D2BQEJJ1X',
     'user': 'U2BLZSKFG',
@@ -29,7 +29,7 @@ describe('context', function () {
     'team': 'T2BM5DPJ6'
   };
 
-  var conversation_response = {
+  const conversation_response = {
     'intents': [],
     'entities': [],
     'input': {
@@ -57,11 +57,11 @@ describe('context', function () {
     }
   };
 
-  var controller = Botkit.slackbot();
-  var bot = controller.spawn({
+  const controller = Botkit.slackbot({ clientSigningSecret: 'slackSuperSecret' });
+  const bot = controller.spawn({
     token: 'abc123'
   });
-  var storage = bot.botkit.storage;
+  const storage = bot.botkit.storage;
 
   describe('readContext()', function () {
     it('should read context correctly', function () {
@@ -71,7 +71,7 @@ describe('context', function () {
     });
 
     it('should suppress storage error', function () {
-      var storageStub = sinon.stub(storage.users, 'get').yields('error message');
+      const storageStub = sinon.stub(storage.users, 'get').yields('error message');
 
       utils.readContext(message, storage, function (err) {
         assert.equal(err, null, 'Error was not suppressed');
@@ -82,7 +82,7 @@ describe('context', function () {
 
   describe('updateContext()', function () {
     it('should store context of the first response', function () {
-      var expectedStore = {
+      const expectedStore = {
         'U2BLZSKFG': {
           'id': 'U2BLZSKFG',
           'context': conversation_response.context
@@ -97,10 +97,10 @@ describe('context', function () {
     });
 
     it('should ignore storage error on read when user is not saved yet', function () {
-      var storageStub1 = sinon.stub(storage.users, 'get').yields(new Error('error message'));
-      var storageStub2 = sinon.stub(storage.users, 'save').yields();
+      const storageStub1 = sinon.stub(storage.users, 'get').yields(new Error('error message'));
+      const storageStub2 = sinon.stub(storage.users, 'save').yields();
 
-      var watsonResponse = {
+      const watsonResponse = {
         context: {
           a: 1
         }
@@ -114,7 +114,7 @@ describe('context', function () {
     });
 
     it('should return storage error on write', function () {
-      var storageStub = sinon.stub(storage.users, 'save').yields('error message');
+      const storageStub = sinon.stub(storage.users, 'save').yields('error message');
 
       utils.updateContext(message.user, storage, conversation_response, function (err) {
         assert.equal(err, 'error message', 'Error was not passed to callback');
@@ -123,15 +123,15 @@ describe('context', function () {
     });
 
     it('should update existing context', function () {
-      var firstContext = {
+      const firstContext = {
         'a': 1,
         'b': 2
       };
-      var secondContext = {
+      const secondContext = {
         'c': 3,
         'd': 4
       };
-      var expectedStore = {
+      const expectedStore = {
         'U2BLZSKFG': {
           'id': 'U2BLZSKFG',
           'context': secondContext
@@ -158,7 +158,7 @@ describe('context', function () {
 
     it('should preserve other data in storage', function () {
 
-      var user = {
+      const user = {
         'id': message.user,
         'profile': {
           'age': 23,
@@ -166,12 +166,12 @@ describe('context', function () {
         }
       };
 
-      var newContext = {
+      const newContext = {
         'a': 1,
         'b': 2
       };
 
-      var expectedStore = {
+      const expectedStore = {
         'U2BLZSKFG': {
           'id': 'U2BLZSKFG',
           'profile': {

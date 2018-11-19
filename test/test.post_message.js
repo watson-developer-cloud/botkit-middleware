@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-var assert = require('assert');
-var utils = require('../lib/middleware/utils');
-var nock = require('nock');
-var ConversationV1 = require('watson-developer-cloud/conversation/v1');
+const assert = require('assert');
+const utils = require('../lib/middleware/utils');
+const nock = require('nock');
+const AssistantV1 = require('watson-developer-cloud/conversation/v1');
 
 describe('conversation()', function () {
 
-  //Watson Conversation params
-  var service = {
+  //Watson Assistant params
+  const service = {
     username: 'batman',
     password: 'bruce-wayne',
     url: 'http://ibm.com:80',
     version: '2018-07-10'
   };
-  var workspace = 'zyxwv-54321';
-  var path = '/v1/workspaces/' + workspace + '/message';
-  var conversation = new ConversationV1(service);
+  const workspace = 'zyxwv-54321';
+  const path = '/v1/workspaces/' + workspace + '/message';
+  const conversation = new AssistantV1(service);
 
   before(function () {
     nock.disableNetConnect();
@@ -41,7 +41,7 @@ describe('conversation()', function () {
   });
 
   it('should initiate a conversation', function (done) {
-    var expected = {
+    const expected = {
       'intents': [],
       'entities': [],
       'input': {
@@ -50,7 +50,7 @@ describe('conversation()', function () {
       'output': {
         'log_messages': [],
         'text': [
-          'Hello from Watson Conversation!'
+          'Hello from Watson Assistant!'
         ],
         'nodes_visited': [
           'node_1_1467221909631'
@@ -82,13 +82,13 @@ describe('conversation()', function () {
       if (err) {
         return done(err);
       }
-      assert.deepEqual(response, expected, 'Conversation response: ' + response + ' does not match expected response ' + expected);
+      assert.deepEqual(response, expected, 'Assistant response: ' + response + ' does not match expected response ' + expected);
       done();
     });
   });
 
   it('should continue a conversation', function (done) {
-    var expected = {
+    const expected = {
       'intents': [],
       'entities': [],
       'input': {
@@ -140,7 +140,7 @@ describe('conversation()', function () {
       if (err) {
         return done(err);
       }
-      assert.deepEqual(response, expected, 'Conversation response: ' + response + ' does not match expected response ' + expected);
+      assert.deepEqual(response, expected, 'Assistant response: ' + response + ' does not match expected response ' + expected);
       done();
     });
   });

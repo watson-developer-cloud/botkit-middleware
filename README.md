@@ -1,6 +1,6 @@
 # Use IBM Watson's Assistant service to chat with your Botkit-powered Bot! [![Build Status](https://travis-ci.org/watson-developer-cloud/botkit-middleware.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/botkit-middleware)
 
-This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Assistant](https://www.ibm.com/watson/services/conversation/) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
+This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Assistant](https://www.ibm.com/watson/ai-assistant/) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
 
 ## Middleware Overview
 
@@ -18,7 +18,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 * `hear`: used for [intent matching](#intent-matching).
 * `updateContext`: used in [implementing app actions](#implementing-app-actions) (sendToWatson does it better now).
 * `readContext`: used in [implementing event handlers](#implementing-event-handlers).
-* `before`: [pre-process](#before-and-after) requests before sending to Watson Assistant (Conversation).
+* `before`: [pre-process](#before-and-after) requests before sending to Watson Assistant (formerly Conversation).
 * `after`: [post-process](#before-and-after) responses before forwarding them to Botkit.
 
 
@@ -31,16 +31,14 @@ $ npm install botkit-middleware-watson --save
 ## Prerequisites
 
 1. Sign up for an [IBM Cloud account](https://console.bluemix.net/registration/).
-1. Download the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/index.html#overview).
 1. Create an instance of the Watson Assistant service and get your credentials:
     - Go to the [Watson Assistant](https://console.bluemix.net/catalog/services/conversation) page in the IBM Cloud Catalog.
     - Log in to your IBM Cloud account.
     - Click **Create**.
-    - Click **Show** to view the service credentials.
     - Copy the `apikey` value, or copy the `username` and `password` values if your service instance doesn't provide an `apikey`.
     - Copy the `url` value.
 
-1. Create a workspace using the Watson Assistant service and copy the `workspace_id`.
+1. Create a workspace using the Watson Assistant service and copy the `workspace_id`. If you don't know how to create a workspace follow the [Getting Started tutorial](https://console.bluemix.net/docs/services/conversation/getting-started.html).
 
 
 ### Acquire channel credentials
@@ -51,7 +49,7 @@ You need a _Slack token_ for your Slack bot to talk to Watson Assistant.
 
 If you have an existing Slack bot, then copy the Slack token from your Slack settings page.
 
-Otherwise, follow [Botkit's instructions](https://github.com/howdyai/botkit/blob/master/docs/readme-slack.md) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
+Otherwise, follow [Botkit's instructions](https://botkit.ai/docs/provisioning/slack-events-api.html) to create your Slack bot from scratch. When your bot is ready, you are provided with a Slack token.
 
 ### Bot setup
 
@@ -59,12 +57,12 @@ This section walks you through code snippets to set up your Slack bot. If you wa
 
 In your app, add the following lines to create your Slack controller using Botkit:
 ```js
-var slackController = Botkit.slackbot();
+const slackController = Botkit.slackbot();
 ```
 
 Spawn a Slack bot using the controller:
 ```js
-var slackBot = slackController.spawn({
+const slackBot = slackController.spawn({
   token: YOUR_SLACK_TOKEN
 });
 ```
@@ -74,7 +72,7 @@ Create the middleware object which you'll use to connect to the Watson Assistant
 If your credentials are `username` and `password` use:
 
 ```js
-var watsonMiddleware = require('botkit-middleware-watson')({
+const watsonMiddleware = require('botkit-middleware-watson')({
   username: YOUR_ASSISTANT_USERNAME,
   password: YOUR_ASSISTANT_PASSWORD,
   url: YOUR_ASSISTANT_URL,
@@ -87,7 +85,7 @@ var watsonMiddleware = require('botkit-middleware-watson')({
 If your credentials is `apikey` use:
 
 ```js
-var watsonMiddleware = require('botkit-middleware-watson')({
+const watsonMiddleware = require('botkit-middleware-watson')({
   iam_apikey: YOUR_API_KEY,
   url: YOUR_ASSISTANT_URL,
   workspace_id: YOUR_WORKSPACE_ID,
@@ -102,7 +100,7 @@ slackController.middleware.receive.use(watsonMiddleware.receive);
 slackBot.startRTM();
 ```
 
-Finally, make your bot _listen_ to incoming messages and respond with Watson Conversation:
+Finally, make your bot _listen_ to incoming messages and respond with Watson Assistant:
 ```js
 slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   if (message.watsonError) {
@@ -112,7 +110,7 @@ slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], f
   }
 });
 ```
-The middleware attaches the `watsonData` object to _message_. This contains the text response from Conversation.
+The middleware attaches the `watsonData` object to _message_. This contains the text response from Assistant.
 If any error happened in middleware, error is assigned to `watsonError` property of the _message_.
 
 Then you're all set!
@@ -141,7 +139,7 @@ slackController.hears(['.*'], ['direct_message'], function(bot, message) {
 #### Using middleware wrapper
 
 ```js
-var receiveMiddleware = function (bot, message, next) {
+const receiveMiddleware = function (bot, message, next) {
   if (message.type === 'direct_message') {
     watsonMiddleware.receive(bot, message, next);
   } else {
@@ -176,17 +174,18 @@ controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention', 'messag
 ```
 
 #### Use the middleware's hear() function
-You can find the default implementation of this function [here](https://github.com/watson-developer-cloud/botkit-middleware/blob/e29b002f2a004f6df57ddf240a3fdf8cb28f95d0/lib/middleware/index.js#L40). If you want, you can redefine this function in the same way that watsonMiddleware.before and watsonMiddleware.after can be redefined. Refer to the [Botkit Middleware documentation](https://github.com/howdyai/botkit/blob/master/docs/middleware.md#hear-middleware) for an example. Then, to use this function instead of Botkit's default pattern matcher (that does not use minimum_confidence), plug it in using:
+You can find the default implementation of this function [here](https://github.com/watson-developer-cloud/botkit-middleware/blob/e29b002f2a004f6df57ddf240a3fdf8cb28f95d0/lib/middleware/index.js#L40). If you want, you can redefine this function in the same way that watsonMiddleware.before and watsonMiddleware.after can be redefined. Refer to the [Botkit Middleware documentation](https://botkit.ai/docs/core.html#controllerhears) for an example. Then, to use this function instead of Botkit's default pattern matcher (that does not use minimum_confidence), plug it in using:
 ```js
 controller.changeEars(watsonMiddleware.hear)
 ```
 
-Note: if you want your own `hear()` function to implement pattern matching like Botkit's default one, you will likely need to implement that yourself. Botkit's default set of 'ears' is the `hears_regexp` function which is implemented [here](https://github.com/howdyai/botkit/blob/77b7d7f80c46d5c8194453667d22118b7850e252/lib/CoreBot.js#L1180).
+Note: if you want your own `hear()` function to implement pattern matching like Botkit's default one, you will likely need to implement that yourself. Botkit's default set of 'ears' is the `hears_regexp` function which is implemented [here](https://github.com/howdyai/botkit/blob/77b7d7f80c46d5c8194453667d22118b7850e252/lib/CoreBot.js#L1187).
 
 ### Implementing app actions
 
-Watson Assistant side of app action is documented in [Developer Cloud](https://console.bluemix.net/docs/services/conversation/develop-app.html#building-a-client-application)
-A common scenario of processing actions is
+Watson Assistant side of app action is documented in [Developer Cloud](https://console.bluemix.net/docs/services/assistant/deploy-custom-app.html#deploy-custom-app)
+A common scenario of processing actions is:
+
 * Send message to user "Please wait while I ..."
 * Perform action
 * Persist results in conversation context
@@ -200,17 +199,16 @@ Using sendToWatson to update context simplifies the bot code compared to solutio
 
 function checkBalance(context, callback) {
   //do something real here
-
-  var contextDelta = {
+  const contextDelta = {
     validAccount: true,
     accountBalance: 95.33
   };
   callback(null, context);
 }
 
-var checkBalanceAsync = Promise.promisify(checkBalance);
+const checkBalanceAsync = Promise.promisify(checkBalance);
 
-var processWatsonResponse = function (bot, message) {
+const processWatsonResponse = function (bot, message) {
   if (message.watsonError) {
     return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   }
@@ -219,7 +217,7 @@ var processWatsonResponse = function (bot, message) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
 
     if (message.watsonData.output.action === 'check_balance') {
-      var newMessage = clone(message);
+      const newMessage = clone(message);
       newMessage.text = 'balance result';
 
       checkBalanceAsync(message.watsonData.context).then(function (contextDelta) {
@@ -248,9 +246,9 @@ function checkBalance(context, callback) {
   callback(null, context);
 }
 
-var checkBalanceAsync = Promise.promisify(checkBalance);
+const checkBalanceAsync = Promise.promisify(checkBalance);
 
-var processWatsonResponse = function (bot, message) {
+const processWatsonResponse = function (bot, message) {
   if (message.watsonError) {
     return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   }
@@ -259,7 +257,7 @@ var processWatsonResponse = function (bot, message) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
 
     if (message.watsonData.output.action === 'check_balance') {
-      var newMessage = clone(message);
+      const newMessage = clone(message);
       newMessage.text = 'balance result';
 
       //check balance
@@ -305,7 +303,7 @@ watsonMiddleware.after = function(message, watsonResponse, callback) {
   callback(null, watsonResponse);
 };
 
-var processWatsonResponse = function(bot, message) {
+const processWatsonResponse = function(bot, message) {
   if (message.watsonError) {
     return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   }
@@ -315,7 +313,7 @@ var processWatsonResponse = function(bot, message) {
     bot.reply(message, message.watsonData.output.text.join('\n'));
 
     if (message.watsonData.output.action === 'check_balance') {
-      var newMessage = clone(message);
+      const newMessage = clone(message);
       newMessage.text = 'balance result';
       //send to watson
       watsonMiddleware.interpret(bot, newMessage, function() {
@@ -424,7 +422,7 @@ Example of setting workspace_id to id provided as a property of hello message:
 ```js
 function handleHelloEvent(bot, message) {
     message.type = 'welcome';
-    var contextDelta = {};
+    const contextDelta = {};
 
     if (message.workspaceId) {
         contextDelta.workspace_id = message.workspaceId;
