@@ -27,7 +27,7 @@ var middleware = require('botkit-middleware-watson')({
 });
 
 // Configure your bot.
-var slackController = Botkit.slackbot();
+var slackController = Botkit.slackbot({ clientSigningSecret: process.env.SLACK_SIGNING_SECRET });
 var slackBot = slackController.spawn({
   token: process.env.SLACK_TOKEN
 });
