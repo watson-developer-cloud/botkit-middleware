@@ -16,7 +16,7 @@
 
 var Botkit = require('botkit');
 
-var controller = Botkit.slackbot();
+var controller = Botkit.slackbot({ clientSigningSecret: process.env.SLACK_SIGNING_SECRET });
 var bot = controller.spawn({
   token: process.env.SLACK_TOKEN
 });

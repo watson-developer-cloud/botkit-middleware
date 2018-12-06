@@ -57,7 +57,7 @@ This section walks you through code snippets to set up your Slack bot. If you wa
 
 In your app, add the following lines to create your Slack controller using Botkit:
 ```js
-const slackController = Botkit.slackbot();
+const slackController = Botkit.slackbot({ clientSigningSecret: YOUR_SLACK_SIGNING_SECRET });
 ```
 
 Spawn a Slack bot using the controller:
