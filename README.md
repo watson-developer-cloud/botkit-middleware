@@ -1,4 +1,4 @@
-# Use IBM Watson's Assistant service to chat with your Botkit-powered Bot! [![Build Status](https://travis-ci.org/watson-developer-cloud/botkit-middleware.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/botkit-middleware)
+# Use IBM Watson's Assistant service to chat with your Botkit-powered Bot! [![Build Status](https://travis-ci.org/watson-developer-cloud/botkit-middleware.svg?branch=master)](https://travis-ci.org/watson-developer-cloud/botkit-middleware) [![Greenkeeper badge](https://badges.greenkeeper.io/watson-developer-cloud/botkit-middleware.svg)](https://greenkeeper.io/)
 
 This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to easily integrate a [Watson Assistant](https://www.ibm.com/watson/ai-assistant/) workspace with multiple social channels like Slack, Facebook, and Twilio. Customers can have simultaneous, independent conversations with a single workspace through different channels.
 
