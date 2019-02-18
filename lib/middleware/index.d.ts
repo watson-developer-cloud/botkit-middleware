@@ -43,6 +43,18 @@ declare namespace WatsonMiddleware {
     [index: string]: any;
   }
 
+  interface ContextDelta {
+    [index: string]: any;
+  }
+
+  interface Payload {
+    workspace_id: string;
+    input: {
+      text: string;
+    };
+    context?: Context;
+  }
+
   interface OutputData {
     text: string[];
     log_messages?: LogMessage[];
@@ -124,19 +136,8 @@ declare namespace WatsonMiddleware {
     updateContextAsync: (user: string, context: Context) => Bluebird<Data>;
   }
 
-  interface Payload {
-    workspace_id: string;
-    input: {
-      text: string;
-    };
-    context?: Context;
-  }
-
-  interface ContextDelta {
-    [index: string]: any;
-  }
-
   export function createWatsonMiddleware(config: MiddlewareConfig): Middleware;
 }
 
-export = WatsonMiddleware.createWatsonMiddleware;
+export default WatsonMiddleware.createWatsonMiddleware;
+export { WatsonMiddleware };
