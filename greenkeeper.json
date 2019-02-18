@@ -1,0 +1,11 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "examples/multi-bot/package.json",
+        "examples/simple-bot/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
