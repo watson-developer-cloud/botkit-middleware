@@ -18,6 +18,8 @@ const assert = require('assert');
 const utils = require('../lib/middleware/utils');
 const Botkit = require('botkit');
 const sinon = require('sinon');
+const MemoryStorage = require('botbuilder').MemoryStorage;
+const WebAdapter = require('botbuilder-adapter-web').WebAdapter;
 
 describe('context', function () {
   const message = {
@@ -57,67 +59,72 @@ describe('context', function () {
     }
   };
 
-  const controller = Botkit.slackbot({ clientSigningSecret: 'slackSuperSecret' });
-  const bot = controller.spawn({
-    token: 'abc123'
+
+  const adapter = new WebAdapter({});
+  const controller = new Botkit.Botkit({
+    adapter: adapter,
+    storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
+    authFunction: function() {} //eliminates 1 line of warning output
   });
-  const storage = bot.botkit.storage;
+
+  const storage = controller.storage;
 
   describe('readContext()', function () {
     it('should read context correctly', function () {
-      utils.readContext(message, storage, function (cb, context) {
-        assert.deepEqual(context, null, 'Actual context: ' + context + '\ndoes not match expected context: ' + null);
+      return utils.readContext(message, storage).then(function (context) {
+        assert.deepEqual(context, null, 'Actual context: ' + JSON.stringify(context) + '\ndoes not match expected context: ' + null);
       });
     });
 
     it('should suppress storage error', function () {
-      const storageStub = sinon.stub(storage.users, 'get').yields('error message');
+      const storageStub = sinon.stub(storage, 'read').rejects('error message');
 
-      utils.readContext(message, storage, function (err) {
-        assert.equal(err, null, 'Error was not suppressed');
+      return utils.readContext(message, storage).then(function() {
+        storageStub.restore();
+      }).catch(function (err) {
+        storageStub.restore();
+        throw err;
       });
-      storageStub.restore();
     });
   });
 
   describe('updateContext()', function () {
     it('should store context of the first response', function () {
-      const expectedStore = {
-        'U2BLZSKFG': {
-          'id': 'U2BLZSKFG',
-          'context': conversation_response.context
-        }
-      };
-      utils.updateContext(message.user, storage, conversation_response, function () {
-        storage.users.all(function (err, data) {
-          assert.equal(err, null);
-          assert.deepEqual(data, expectedStore, 'Updated store: ' + data + '\ndoes not match expected store: ' + expectedStore);
-        });
+
+      var itemId = 'user.' + message.user;
+      return utils.updateContext(message.user, storage, conversation_response).then(function () {
+        return storage.read([itemId]);
+      }).then(function (data) {
+        assert.deepEqual(data[itemId].context, conversation_response.context, 'Updated store: ' + JSON.stringify(data[itemId].context) + '\ndoes not match expected store: ' + JSON.stringify(conversation_response.context));
       });
     });
 
     it('should ignore storage error on read when user is not saved yet', function () {
-      const storageStub1 = sinon.stub(storage.users, 'get').yields(new Error('error message'));
-      const storageStub2 = sinon.stub(storage.users, 'save').yields();
+      const storageStub1 = sinon.stub(storage, 'read').rejects(new Error('error message'));
+      const storageStub2 = sinon.stub(storage, 'write').resolves();
 
       const watsonResponse = {
         context: {
           a: 1
         }
       };
-      utils.updateContext('NEWUSER3', storage, watsonResponse, function (err, response) {
-        assert.ifError(err);
+      return utils.updateContext('NEWUSER3', storage, watsonResponse).then(function (response) {
         assert.equal(response, watsonResponse);
+        storageStub1.restore();
+        storageStub2.restore();
+      }).catch(function () {
         storageStub1.restore();
         storageStub2.restore();
       });
     });
 
     it('should return storage error on write', function () {
-      const storageStub = sinon.stub(storage.users, 'save').yields('error message');
+      const storageStub = sinon.stub(storage, 'write').rejects('error message');
 
-      utils.updateContext(message.user, storage, conversation_response, function (err) {
+      utils.updateContext(message.user, storage, conversation_response).then(function (err) {
         assert.equal(err, 'error message', 'Error was not passed to callback');
+        storageStub.restore();
+      }).catch(function () {
         storageStub.restore();
       });
     });
@@ -131,35 +138,24 @@ describe('context', function () {
         'c': 3,
         'd': 4
       };
-      const expectedStore = {
-        'U2BLZSKFG': {
-          'id': 'U2BLZSKFG',
-          'context': secondContext
-        }
-      };
       //first update
-      utils.updateContext(message.user, storage, {
+      return utils.updateContext(message.user, storage, {
         context: firstContext
-      }, function (err) {
-        assert.ifError(err);
+      }).then(function () {
         //second update
-        utils.updateContext(message.user, storage, {
+        return utils.updateContext(message.user, storage, {
           context: secondContext
-        }, function (err) {
-          assert.ifError(err);
-
-          storage.users.all(function (err, data) {
-            assert.equal(err, null);
-            assert.deepEqual(data, expectedStore, 'Updated store: ' + data + '\ndoes not match expected store: ' + expectedStore);
-          });
         });
+      }).then(function () {
+        return storage.read(['user.U2BLZSKFG']);
+      }).then(function (data) {
+        assert.deepEqual(data['user.U2BLZSKFG'].context, secondContext, 'Updated context: ' + JSON.stringify(data['user.U2BLZSKFG'].context) + '\ndoes not match expected context: ' + JSON.stringify(secondContext));
       });
     });
 
     it('should preserve other data in storage', function () {
-
       const user = {
-        'id': message.user,
+        'id': 'U2BLZSKFX',
         'profile': {
           'age': 23,
           'sex': 'male'
@@ -171,30 +167,20 @@ describe('context', function () {
         'b': 2
       };
 
-      const expectedStore = {
-        'U2BLZSKFG': {
-          'id': 'U2BLZSKFG',
-          'profile': {
-            'age': 23,
-            'sex': 'male',
-          },
-          'context': newContext
-        }
-      };
+      var itemId = 'user.' + user.id;
 
-      storage.users.save(user, function (err) {
-        assert.ifError(err);
+      var existingData = {};
+      existingData[itemId] = user;
 
-        utils.updateContext(message.user, storage, {
+      return storage.write(existingData).then(function () {
+        return utils.updateContext(user.id, storage, {
           context: newContext
-        }, function (err) {
-          assert.ifError(err);
-
-          storage.users.all(function (err, data) {
-            assert.equal(err, null);
-            assert.deepEqual(data, expectedStore, 'Updated store: ' + data + '\ndoes not match expected store: ' + expectedStore);
-          });
         });
+      }).then(function () {
+        return storage.read([itemId]);
+      }).then(function (data) {
+        assert.deepEqual(data[itemId].profile, user.profile, 'Profile was not preserved: ' + JSON.stringify(data[itemId].profile) + '\ndoes not match: ' + JSON.stringify(user.profile));
+        assert.deepEqual(data[itemId].context, newContext, 'Updated context: ' + JSON.stringify(data[itemId].context) + '\ndoes not match expected context: ' + JSON.stringify(newContext));
       });
     });
   });

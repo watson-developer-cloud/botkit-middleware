@@ -17,6 +17,8 @@
 const assert = require('assert');
 const Botkit = require('botkit');
 const nock = require('nock');
+const MemoryStorage = require('botbuilder').MemoryStorage;
+const WebAdapter = require('botbuilder-adapter-web').WebAdapter;
 
 describe('receive()', function () {
 
@@ -30,11 +32,15 @@ describe('receive()', function () {
   const workspace_id = 'zyxwv-54321';
   const path = '/v1/workspaces/' + workspace_id + '/message';
 
-  // Botkit params
-  const controller = Botkit.slackbot({ clientSigningSecret: 'slackSuperSecret' });
-  const bot = controller.spawn({
-    token: 'abc123'
+  const adapter = new WebAdapter({});
+  const controller = new Botkit.Botkit({
+    adapter: adapter,
+    storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
+    authFunction: function() {} //eliminates 1 line of warning output
   });
+
+  var bot;
+
   const message = {
     'type': 'message',
     'channel': 'D2BQEJJ1X',
@@ -50,6 +56,9 @@ describe('receive()', function () {
 
   before(function () {
     nock.disableNetConnect();
+    return controller.spawn().then((botWorker) => {
+      bot = botWorker;
+    });
   });
 
   after(function () {

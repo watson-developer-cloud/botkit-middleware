@@ -1,12 +1,7 @@
 import * as Botkit from 'botkit';
 import Bluebird = require('bluebird');
+import { Storage } from 'botbuilder-core';
 
-declare module 'botkit' {
-  interface Message {
-    watsonError?: Error | string;
-    watsonData?: WatsonMiddleware.Data;
-  }
-}
 
 declare namespace WatsonMiddleware {
   interface Data {
@@ -74,32 +69,28 @@ declare namespace WatsonMiddleware {
   interface Middleware {
     minimum_confidence: number;
     conversation: any;
-    storage: {
-      users: Botkit.Storage<Botkit.User>;
-      channels: Botkit.Storage<Botkit.Channel>;
-      teams: Botkit.Storage<Botkit.Team>;
-    };
-    hear: (patterns: string[], message: Botkit.Message) => boolean;
+    storage: Storage;
+    hear: (patterns: string[], message: Botkit.BotkitMessage) => boolean;
     before: (
-      message: Botkit.Message,
+      message: Botkit.BotkitMessage,
       payload: Payload,
       callback: (err: string | Error, payload: Payload) => void
     ) => void;
-    after: (message: Botkit.Message, response, callback) => void;
+    after: (message: Botkit.BotkitMessage, response, callback) => void;
     sendToWatson: (
-      bot: Botkit.Bot<any, Botkit.Message>,
-      message: Botkit.Message,
+      bot: Botkit.BotWorker,
+      message: Botkit.BotkitMessage,
       contextDelta: ContextDelta,
       next: () => void
     ) => void;
     receive: (
-      bot: Botkit.Bot<any, Botkit.Message>,
-      message: Botkit.Message,
+      bot: Botkit.BotWorker,
+      message: Botkit.BotkitMessage,
       next: () => void
     ) => void;
     interpret: (
-      bot: Botkit.Bot<any, Botkit.Message>,
-      message: Botkit.Message,
+      bot: Botkit.BotWorker,
+      message: Botkit.BotkitMessage,
       next: () => void
     ) => void;
     readContext: (
@@ -112,13 +103,13 @@ declare namespace WatsonMiddleware {
       callback: (err: string | Error | null, watsonResponse?: Data) => void
     ) => void;
     sendToWatsonAsync: (
-      bot: Botkit.Bot<any, Botkit.Message>,
-      message: Botkit.Message,
+      bot: Botkit.BotWorker,
+      message: Botkit.BotkitMessage,
       contextDelta: ContextDelta
     ) => Bluebird<void>;
     interpretAsync: (
-      bot: Botkit.Bot<any, Botkit.Message>,
-      message: Botkit.Message
+      bot: Botkit.BotWorker,
+      message: Botkit.BotkitMessage
     ) => Bluebird<void>;
     readContextAsync: (user: string) => Bluebird<Context>;
     updateContextAsync: (user: string, context: Context) => Bluebird<Data>;
@@ -136,7 +127,7 @@ declare namespace WatsonMiddleware {
     [index: string]: any;
   }
 
-  export function createWatsonMiddleware(config: MiddlewareConfig): Middleware;
+  export function factory(config: MiddlewareConfig): Middleware;
 }
 
-export = WatsonMiddleware.createWatsonMiddleware;
+export = WatsonMiddleware.factory;

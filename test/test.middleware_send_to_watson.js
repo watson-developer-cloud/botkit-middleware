@@ -19,6 +19,8 @@ const Botkit = require('botkit');
 const nock = require('nock');
 const utils = require('../lib/middleware/utils');
 const clone = require('clone');
+const MemoryStorage = require('botbuilder').MemoryStorage;
+const WebAdapter = require('botbuilder-adapter-web').WebAdapter;
 
 describe('sendToWatson()', function () {
 
@@ -32,11 +34,15 @@ describe('sendToWatson()', function () {
   const workspace_id = 'zyxwv-54321';
   const path = '/v1/workspaces/' + workspace_id + '/message';
 
-  // Botkit params
-  const controller = Botkit.slackbot({ clientSigningSecret: 'slackSuperSecret' });
-  const bot = controller.spawn({
-    token: 'abc123'
+  const adapter = new WebAdapter({});
+  const controller = new Botkit.Botkit({
+    adapter: adapter,
+    storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
+    authFunction: function() {} //eliminates 1 line of warning output
   });
+
+  var bot;
+
   const message = {
     'type': 'message',
     'channel': 'D2BQEJJ1X',
@@ -52,6 +58,9 @@ describe('sendToWatson()', function () {
 
   before(function () {
     nock.disableNetConnect();
+    return controller.spawn().then((botWorker) => {
+      bot = botWorker;
+    });
   });
 
   after(function () {
@@ -138,11 +147,9 @@ describe('sendToWatson()', function () {
       .post(path + '?version=' + service.version, expectedRequest)
       .reply(200, mockedWatsonResponse);
 
-    utils.updateContext(message.user, bot.botkit.storage, {
+    utils.updateContext(message.user, controller.storage, {
       context: storedContext
-    }, function (err) {
-      assert.ifError(err);
-
+    }).then(function () {
       middleware.sendToWatson(bot, message, contextDelta, function (err) {
         assert.ifError(err);
         assert.ifError(message.watsonError);
@@ -150,6 +157,8 @@ describe('sendToWatson()', function () {
         assert.deepEqual(message.watsonData.context, expectedContextInResponse);
         done();
       });
+    }).catch(function(err) {
+      done(err);
     });
   });
 
@@ -207,11 +216,9 @@ describe('sendToWatson()', function () {
       .post(path + '?version=' + service.version, expectedRequest)
       .reply(200, mockedWatsonResponse);
 
-    utils.updateContext(message.user, bot.botkit.storage, {
+    utils.updateContext(message.user, controller.storage, {
       context: storedContext
-    }, function (err) {
-      assert.ifError(err);
-
+    }).then(function() {
       middleware.sendToWatson(bot, message, function (err) {
         assert.ifError(err);
         assert.ifError(message.watsonError);
@@ -219,6 +226,8 @@ describe('sendToWatson()', function () {
         assert.deepEqual(message.watsonData.context, expectedContextInResponse);
         done();
       });
+    }).catch(function(err) {
+      done(err);
     });
   });
 
@@ -271,10 +280,9 @@ describe('sendToWatson()', function () {
       .post(expectedPath + '?version=' + service.version, expectedRequest)
       .reply(200, mockedWatsonResponse);
 
-    utils.updateContext(message.user, bot.botkit.storage, {
+    utils.updateContext(message.user, controller.storage, {
       context: storedContext
-    }, function (err) {
-      assert.ifError(err);
+    }).then(function () {
 
       middleware.sendToWatson(bot, message, function (err) {
         assert.ifError(err);
@@ -283,6 +291,8 @@ describe('sendToWatson()', function () {
         mockedRequest.done();
         done();
       });
+    }).catch(function(err) {
+      done(err);
     });
   });
 });
