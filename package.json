@@ -25,18 +25,18 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "assert": "^1.4.1",
-    "botkit": "^0.7.2",
+    "botkit": "^0.7.4",
     "clone": "^2.1.2",
-    "eslint": "^5.9.0",
-    "mocha": "^6.0.0",
-    "nock": "^10.0.2",
-    "sinon": "^7.1.1"
+    "eslint": "^5.16.0",
+    "mocha": "^6.1.4",
+    "nock": "^10.0.6",
+    "sinon": "^7.3.2"
   },
   "dependencies": {
-    "@types/bluebird": "^3.5.24",
-    "bluebird": "^3.5.3",
-    "debug": "^4.1.0",
+    "@types/bluebird": "^3.5.26",
+    "bluebird": "^3.5.4",
+    "debug": "^4.1.1",
     "deepmerge": "^3.2.0",
-    "watson-developer-cloud": "^3.13.0"
+    "ibm-watson": "^4.0.1"
   }
 }

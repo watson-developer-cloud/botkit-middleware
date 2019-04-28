@@ -17,7 +17,7 @@
 const assert = require('assert');
 const utils = require('../lib/middleware/utils');
 const nock = require('nock');
-const AssistantV1 = require('watson-developer-cloud/assistant/v1');
+const AssistantV1 = require('ibm-watson/assistant/v1');
 
 describe('conversation()', function () {
 
