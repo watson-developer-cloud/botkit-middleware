@@ -60,11 +60,11 @@ describe('context', function () {
   };
 
 
-  const adapter = new WebAdapter({});
+  const adapter = new WebAdapter({noServer: true});
   const controller = new Botkit.Botkit({
     adapter: adapter,
     storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
-    authFunction: function() {} //eliminates 1 line of warning output
+    disable_webserver: true
   });
 
   const storage = controller.storage;

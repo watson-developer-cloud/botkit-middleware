@@ -19,6 +19,7 @@ const Botkit = require('botkit');
 const nock = require('nock');
 const MemoryStorage = require('botbuilder').MemoryStorage;
 const WebAdapter = require('botbuilder-adapter-web').WebAdapter;
+const WatsonMiddleware = require('../lib/middleware/index').WatsonMiddleware;
 
 describe('receive()', function () {
 
@@ -32,11 +33,11 @@ describe('receive()', function () {
   const workspace_id = 'zyxwv-54321';
   const path = '/v1/workspaces/' + workspace_id + '/message';
 
-  const adapter = new WebAdapter({});
+  const adapter = new WebAdapter({noServer: true});
   const controller = new Botkit.Botkit({
     adapter: adapter,
     storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
-    authFunction: function() {} //eliminates 1 line of warning output
+    disable_webserver: true
   });
 
   var bot;
@@ -52,7 +53,7 @@ describe('receive()', function () {
 
   const config = service;
   config.workspace_id = workspace_id;
-  const middleware = require('../lib/middleware/index')(config);
+  const middleware = new WatsonMiddleware(config);
 
   before(function () {
     nock.disableNetConnect();

@@ -1,0 +1,2 @@
+lib/middleware/*.js
+lib/middleware/*.d.ts

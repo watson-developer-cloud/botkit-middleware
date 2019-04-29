@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./lib/middleware",
+    "rootDir": "./lib/middleware",
+    "lib": [
+      "es5",
+      "es2015",
+      "dom"
+    ]
+  },
+  "include": [
+    "./lib/middleware/*"
+  ],
+  "exclude": [
+    "./node_modules"
+  ]
+}

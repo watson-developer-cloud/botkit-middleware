@@ -6,8 +6,11 @@
   "types": "lib/middleware/index.d.ts",
   "scripts": {
     "start": "node lib/middleware/index.js",
+    "build": "node ./node_modules/typescript/bin/tsc",
+    "pretest": "node ./node_modules/typescript/bin/tsc",
     "test": "mocha test --exit",
-    "lint": "eslint ."
+    "lint": "eslint lib/middleware/{index,utils}.ts",
+    "fix": "eslint --fix lib/middleware/{index,utils}.ts"
   },
   "repository": {
     "type": "git",
@@ -24,20 +27,21 @@
   ],
   "license": "Apache-2.0",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.7.0",
     "assert": "^1.4.1",
-    "botbuilder-adapter-web": "^1.0.0-prerelease-1",
-    "botkit": "^4.0.0-prerelease-2",
+    "botbuilder-adapter-web": "^1.0.1",
+    "botkit": "^4.0.1",
     "clone": "^2.1.2",
     "eslint": "^5.16.0",
     "mocha": "^6.1.4",
     "nock": "^10.0.6",
-    "sinon": "^7.3.2"
+    "sinon": "^7.3.2",
+    "typescript": "^3.4.5"
   },
   "dependencies": {
-    "@types/bluebird": "^3.5.26",
-    "bluebird": "^3.5.4",
     "debug": "^4.1.1",
     "deepmerge": "^3.2.0",
-    "ibm-watson": "^4.0.1"
+    "ibm-watson": "^4.1.0"
   }
 }

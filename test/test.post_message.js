@@ -40,7 +40,7 @@ describe('conversation()', function () {
     nock.cleanAll();
   });
 
-  it('should initiate a conversation', function (done) {
+  it('should initiate a conversation', function () {
     const expected = {
       'intents': [],
       'entities': [],
@@ -72,22 +72,17 @@ describe('conversation()', function () {
       .post(path + '?version=' + service.version)
       .reply(200, expected);
 
-    utils.postMessage(conversation, {
+    return utils.postMessage(conversation, {
       workspace_id: workspace,
       input: {
         text: 'hi'
       }
-    },
-    function (err, response) {
-      if (err) {
-        return done(err);
-      }
-      assert.deepEqual(response, expected, 'Assistant response: ' + response + ' does not match expected response ' + expected);
-      done();
+    }).then(function (response) {
+      assert.deepEqual(response, expected, 'Assistant response: ' + JSON.stringify(response) + ' does not match expected response ' + JSON.stringify(expected));
     });
   });
 
-  it('should continue a conversation', function (done) {
+  it('should continue a conversation', function () {
     const expected = {
       'intents': [],
       'entities': [],
@@ -120,7 +115,7 @@ describe('conversation()', function () {
       .post(path + '?version=' + service.version)
       .reply(200, expected);
 
-    utils.postMessage(conversation, {
+    return utils.postMessage(conversation, {
       workspace_id: workspace,
       input: {
         text: 'What can you do?'
@@ -135,13 +130,8 @@ describe('conversation()', function () {
           'dialog_request_counter': 1
         }
       }
-    },
-    function (err, response) {
-      if (err) {
-        return done(err);
-      }
-      assert.deepEqual(response, expected, 'Assistant response: ' + response + ' does not match expected response ' + expected);
-      done();
+    }).then(function (response) {
+      assert.deepEqual(response, expected, 'Assistant response: ' + JSON.stringify(response) + ' does not match expected response ' + JSON.stringify(expected));
     });
   });
 

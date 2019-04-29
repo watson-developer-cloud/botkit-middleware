@@ -2,9 +2,12 @@ env:
   es6: true
   node: true
   mocha: true
-extends: 'eslint:recommended'
+extends: 'plugin:@typescript-eslint/recommended'
+parser: '@typescript-eslint/parser'
 parserOptions:
-  ecmaVersion: 2016
+  project: './tsconfig.json'
+plugins:
+  - '@typescript-eslint'
 rules:
   indent:
     - error
@@ -19,4 +22,9 @@ rules:
     - error
     - always
   no-console:
-    - warn
+    - off
+  '@typescript-eslint/indent':
+    - error
+    - 2
+  ' @typescript-eslint/no-explicit-any':
+    - warning

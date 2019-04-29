@@ -21,6 +21,7 @@ const utils = require('../lib/middleware/utils');
 const clone = require('clone');
 const MemoryStorage = require('botbuilder').MemoryStorage;
 const WebAdapter = require('botbuilder-adapter-web').WebAdapter;
+const WatsonMiddleware = require('../lib/middleware/index').WatsonMiddleware;
 
 describe('sendToWatson()', function () {
 
@@ -34,11 +35,11 @@ describe('sendToWatson()', function () {
   const workspace_id = 'zyxwv-54321';
   const path = '/v1/workspaces/' + workspace_id + '/message';
 
-  const adapter = new WebAdapter({});
+  const adapter = new WebAdapter({noServer: true});
   const controller = new Botkit.Botkit({
     adapter: adapter,
     storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
-    authFunction: function() {} //eliminates 1 line of warning output
+    disable_webserver: true
   });
 
   var bot;
@@ -54,7 +55,7 @@ describe('sendToWatson()', function () {
 
   const config = service;
   config.workspace_id = workspace_id;
-  const middleware = require('../lib/middleware/index')(config);
+  const middleware = new WatsonMiddleware(config);
 
   before(function () {
     nock.disableNetConnect();
@@ -162,76 +163,7 @@ describe('sendToWatson()', function () {
     });
   });
 
-  it('should work if contextDelta parameter is missing for backwards compatibility', function (done) {
-    const storedContext = {
-      a: 1,
-      b: 'string',
-      c: {
-        d: 2,
-        e: 3,
-        f: {
-          g: 4,
-          h: 5
-        }
-      }
-    };
-
-    const expectedContextInResponse = clone(storedContext);
-    expectedContextInResponse.conversation_id = '8a79f4db-382c-4d56-bb88-1b320edf9eae';
-    expectedContextInResponse.system = {
-      dialog_stack: [
-        'root'
-      ],
-      dialog_turn_counter: 1,
-      dialog_request_counter: 1
-    };
-
-    const expectedRequest = {
-      input: {
-        text: message.text
-      },
-      context: storedContext
-    };
-
-    const mockedWatsonResponse = {
-      'intents': [],
-      'entities': [],
-      'input': {
-        'text': 'hi'
-      },
-      'output': {
-        'log_messages': [],
-        'text': [
-          'Hello from Watson Assistant!'
-        ],
-        'nodes_visited': [
-          'node_1_1467221909631'
-        ]
-      },
-      'context': expectedContextInResponse
-    };
-
-    //verify request and return mocked response
-    nock(service.url)
-      .post(path + '?version=' + service.version, expectedRequest)
-      .reply(200, mockedWatsonResponse);
-
-    utils.updateContext(message.user, controller.storage, {
-      context: storedContext
-    }).then(function() {
-      middleware.sendToWatson(bot, message, function (err) {
-        assert.ifError(err);
-        assert.ifError(message.watsonError);
-
-        assert.deepEqual(message.watsonData.context, expectedContextInResponse);
-        done();
-      });
-    }).catch(function(err) {
-      done(err);
-    });
-  });
-
-  it('should make request to different workspace, if workspace_id is set in context', function (done) {
+  it('should make request to different workspace, if workspace_id is set in context', async function () {
     const newWorkspaceId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
 
     const expectedPath = '/v1/workspaces/' + newWorkspaceId + '/message';
@@ -280,19 +212,17 @@ describe('sendToWatson()', function () {
       .post(expectedPath + '?version=' + service.version, expectedRequest)
       .reply(200, mockedWatsonResponse);
 
-    utils.updateContext(message.user, controller.storage, {
-      context: storedContext
-    }).then(function () {
-
-      middleware.sendToWatson(bot, message, function (err) {
-        assert.ifError(err);
-        assert.ifError(message.watsonError);
-
-        mockedRequest.done();
-        done();
+    try {
+      await utils.updateContext(message.user, controller.storage, {
+        context: storedContext
       });
-    }).catch(function(err) {
-      done(err);
-    });
+
+      await middleware.sendToWatsonAsync(bot, message, {});
+      assert.ifError(message.watsonError);
+      mockedRequest.done();
+    } catch(err) {
+      mockedRequest.done();
+      throw err;
+    }
   });
 });

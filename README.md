@@ -56,23 +56,30 @@ Otherwise, follow [Botkit's instructions](https://botkit.ai/docs/provisioning/sl
 This section walks you through code snippets to set up your Slack bot. If you want, you can jump straight to the [full example](/examples/simple-bot).
 
 In your app, add the following lines to create your Slack controller using Botkit:
-```js
-const slackController = Botkit.slackbot({ clientSigningSecret: YOUR_SLACK_SIGNING_SECRET });
-```
+```typescript
+import { WatsonMiddleware } from 'botkit-middleware-watson';
+import Botkit = require('botkit');
+const { SlackAdapter } = require('botbuilder-adapter-slack');
 
-Spawn a Slack bot using the controller:
-```js
-const slackBot = slackController.spawn({
-  token: YOUR_SLACK_TOKEN
+const adapter = new SlackAdapter({
+    clientSigningSecret: process.env.SLACK_SECRET,
+    botToken: process.env.SLACK_TOKEN
+});
+
+const controller = new Botkit({
+    adapter,
+    // ...other options
 });
 ```
+
+
 
 Create the middleware object which you'll use to connect to the Watson Assistant service.
 
 If your credentials are `username` and `password` use:
 
-```js
-const watsonMiddleware = require('botkit-middleware-watson')({
+```typescript
+const watsonMiddleware = new WatsonMiddleware({
   username: YOUR_ASSISTANT_USERNAME,
   password: YOUR_ASSISTANT_PASSWORD,
   url: YOUR_ASSISTANT_URL,
@@ -84,8 +91,8 @@ const watsonMiddleware = require('botkit-middleware-watson')({
 
 If your credentials is `apikey` use:
 
-```js
-const watsonMiddleware = require('botkit-middleware-watson')({
+```typescript
+const watsonMiddleware = new WatsonMiddleware({
   iam_apikey: YOUR_API_KEY,
   url: YOUR_ASSISTANT_URL,
   workspace_id: YOUR_WORKSPACE_ID,
@@ -95,18 +102,17 @@ const watsonMiddleware = require('botkit-middleware-watson')({
 ```
 
 Tell your Slackbot to use the _watsonMiddleware_ for incoming messages:
-```js
-slackController.middleware.receive.use(watsonMiddleware.receive);
-slackBot.startRTM();
+```typescript
+controller.middleware.receive.use(watsonMiddleware.receive.bind(watsonMiddleware));
 ```
 
 Finally, make your bot _listen_ to incoming messages and respond with Watson Assistant:
-```js
-slackController.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+```typescript
+controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], async function(bot, message) {
   if (message.watsonError) {
-    bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+    await  bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   } else {
-    bot.reply(message, message.watsonData.output.text.join('\n'));
+    await bot.reply(message, message.watsonData.output.text.join('\n'));
   }
 });
 ```
@@ -125,7 +131,7 @@ If you would like to make your bot to only respond to _direct messages_ using As
 #### Using interpret function instead of registering middleware
 
 ```js
-slackController.hears(['.*'], ['direct_message'], function(bot, message) {
+slackController.hears(['.*'], ['direct_message'], async function(bot, message) {
   middleware.interpret(bot, message, function() {
     if (message.watsonError) {
       bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
@@ -158,16 +164,16 @@ To use the setup parameter `minimum_confidence`, you have multiple options:
 
 For example:
 ```js
-controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention', 'message_received'], function(bot, message) {
+controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention', 'message_received'], async function(bot, message) {
   if (message.watsonError) {
-    bot.reply(message, "Sorry, there are technical problems.");     // deal with watson error
+    await bot.reply(message, "Sorry, there are technical problems.");     // deal with watson error
   } else {
     if (message.watsonData.intents.length == 0) {
-      bot.reply(message, "Sorry, I could not understand the message.");     // was any intent recognized?
+      await bot.reply(message, "Sorry, I could not understand the message.");     // was any intent recognized?
     } else if (message.watsonData.intents[0].confidence < watsonMiddleware.minimum_confidence) {
-      bot.reply(message, "Sorry, I am not sure what you have said.");      // is the confidence high enough?
+      await bot.reply(message, "Sorry, I am not sure what you have said.");      // is the confidence high enough?
     } else {
-      bot.reply(message, message.watsonData.output.text.join('\n'));      // reply with Watson response
+      await bot.reply(message, message.watsonData.output.text.join('\n'));      // reply with Watson response
     }
   }
 });
@@ -195,8 +201,8 @@ A common scenario of processing actions is:
 ### using sendToWatson to update context (possible since v1.5.0)
 
 Using sendToWatson to update context simplifies the bot code compared to solution using updateContext below.
-```js
 
+```typescript
 function checkBalance(context, callback) {
   //do something real here
   const contextDelta = {
@@ -208,126 +214,32 @@ function checkBalance(context, callback) {
 
 const checkBalanceAsync = Promise.promisify(checkBalance);
 
-const processWatsonResponse = function (bot, message) {
+const processWatsonResponse = async (bot, message) => {
   if (message.watsonError) {
-    return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
+    return await bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
   }
   if (typeof message.watsonData.output !== 'undefined') {
     //send "Please wait" to users
-    bot.reply(message, message.watsonData.output.text.join('\n'));
+    await bot.reply(message, message.watsonData.output.text.join('\n'));
 
     if (message.watsonData.output.action === 'check_balance') {
       const newMessage = clone(message);
       newMessage.text = 'balance result';
 
-      checkBalanceAsync(message.watsonData.context).then(function (contextDelta) {
-        return watsonMiddleware.sendToWatsonAsync(bot, newMessage, contextDelta);
-      }).catch(function (error) {
+      try {
+        const contextDelta = await checkBalanceAsync(message.watsonData.context);
+        await watsonMiddleware.sendToWatsonAsync(bot, newMessage, contextDelta);
+      }catch(error) {
         newMessage.watsonError = error;
-      }).then(function () {
-        return processWatsonResponse(bot, newMessage);
-      });
+      }
+      
+      return await processWatsonResponse(bot, newMessage);
     }
   }
 };
 
 controller.on('message_received', processWatsonResponse);
 ```
-
-#### Using updateContext in controller (available since v1.4.0)
-
-Since 1.4.0 it is possible to update context from controller code.
-```js
-
-function checkBalance(context, callback) {
-  //this version of function updates only the context object
-  context.validAccount = true;
-  context.accountBalance = 95.33;
-  callback(null, context);
-}
-
-const checkBalanceAsync = Promise.promisify(checkBalance);
-
-const processWatsonResponse = function (bot, message) {
-  if (message.watsonError) {
-    return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
-  }
-  if (typeof message.watsonData.output !== 'undefined') {
-    //send "Please wait" to users
-    bot.reply(message, message.watsonData.output.text.join('\n'));
-
-    if (message.watsonData.output.action === 'check_balance') {
-      const newMessage = clone(message);
-      newMessage.text = 'balance result';
-
-      //check balance
-      checkBalanceAsync(message.watsonData.context).then(function (context) {
-        //update context in storage
-        return watsonMiddleware.updateContextAsync(message.user, context);
-      }).then(function () {
-        //send message to watson (it reads updated context from storage)
-        return watsonMiddleware.sendToWatsonAsync(bot, newMessage);
-      }).catch(function (error) {
-        newMessage.watsonError = error;
-      }).then(function () {
-        //send results to user
-        return processWatsonResponse(bot, newMessage);
-      });
-    }
-  }
-};
-
-controller.on('message_received', processWatsonResponse);
-```
-
-#### Using middleware.after and controller
-
-Before v1.4.0 only middleware.after callback can update context, and only controller can send replies to user.
-The downside is that it is impossible to send "Please wait message".
-
-```js
-function checkBalance(watsonResponse, callback) {
-  //middleware.after function must pass a complete Watson respose to callback
-  watsonResponse.context.validAccount = true;
-  watsonResponse.context.accountBalance = 95.33;
-  callback(null, watsonResponse);
-}
-
-watsonMiddleware.after = function(message, watsonResponse, callback) {
-  //real action happens in middleware.after
-  if (typeof watsonResponse !== 'undefined' && typeof watsonResponse.output !== 'undefined') {
-    if (watsonResponse.output.action === 'check_balance') {
-      return checkBalance(watsonResponse, callback);
-    }
-  }
-  callback(null, watsonResponse);
-};
-
-const processWatsonResponse = function(bot, message) {
-  if (message.watsonError) {
-    return bot.reply(message, "I'm sorry, but for technical reasons I can't respond to your message");
-  }
-
-  if (typeof message.watsonData.output !== 'undefined') {
-    //send "Please wait" to users
-    bot.reply(message, message.watsonData.output.text.join('\n'));
-
-    if (message.watsonData.output.action === 'check_balance') {
-      const newMessage = clone(message);
-      newMessage.text = 'balance result';
-      //send to watson
-      watsonMiddleware.interpret(bot, newMessage, function() {
-        //send results to user
-        processWatsonResponse(bot, newMessage);
-      });
-    }
-  }
-};
-
-controller.on('message_received', processWatsonResponse);
-
-```
-
 
 ## Implementing event handlers
 
@@ -376,17 +288,17 @@ The `hear()` function can be used on individual handler functions, or can be use
 
 Used on an individual handler:
 
-```js
-slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], watsonMiddleware.hear, function(bot, message) {
-  bot.reply(message, message.watsonData.output.text.join('\n'));
+```typescript
+slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], watsonMiddleware.hear, async function(bot, message) {
+  await bot.reply(message, message.watsonData.output.text.join('\n'));
   // now do something special related to the hello intent
 });
 ```
 
 Used globally:
 
-```js
-slackController.changeEars(watsonMiddleware.hear);
+```typescript
+slackController.changeEars(watsonMiddleware.hear.bind(watsonMiddleware));
 
 slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
   bot.reply(message, message.watsonData.output.text.join('\n'));
@@ -419,20 +331,21 @@ middleware.before = function(message, assistantPayload, callback) {
 If you need to make use of multiple workspaces in a single bot, workspace_id can be changed dynamically by setting workspace_id property in context.
 
 Example of setting workspace_id to id provided as a property of hello message:
-```js
-function handleHelloEvent(bot, message) {
-    message.type = 'welcome';
-    const contextDelta = {};
+```typescript
+async function handleHelloEvent(bot, message) {
+  message.type = 'welcome';
+  const contextDelta = {};
 
-    if (message.workspaceId) {
-        contextDelta.workspace_id = message.workspaceId;
-    }
+  if (message.workspaceId) {
+    contextDelta.workspace_id = message.workspaceId;
+  }
 
-    watsonMiddleware.sendToWatsonAsync(bot, message, contextDelta).catch(function (error) {
-        message.watsonError = error;
-    }).then(function () {
-        bot.reply(message, message.watsonData.output.text.join('\n'));
-    });
+  try {
+    watsonMiddleware.sendToWatsonAsync(bot, message, contextDelta);
+  } catch(error) {
+    message.watsonError = error;
+  }
+  await bot.reply(message, message.watsonData.output.text.join('\n'));
 }
 
 controller.on('hello', handleHelloEvent);
