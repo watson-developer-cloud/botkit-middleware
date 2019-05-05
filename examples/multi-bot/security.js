@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-var crypto = require('crypto');
+const crypto = require('crypto');
 
 /**
  * Verify the request came from Facebook using the approaches described here:
  * https://developers.facebook.com/docs/graph-api/webhooks
  */
 module.exports = function verifyFacebookSignatureHeader(req, res, buf) {
-  var signature = req.headers['x-hub-signature'];
+  const signature = req.headers['x-hub-signature'];
 
   if (!signature) {
     console.log('Signature absent in the request: %s', JSON.stringify(req));
   } else {
     // Get the facebook signature
-    var elements = signature.split('sha1=');
-    var facebookSignature = elements[1];
+    const elements = signature.split('sha1=');
+    const facebookSignature = elements[1];
 
-    var expectedSignature = crypto.createHmac('sha1', process.env.FB_APP_SECRET)
+    const expectedSignature = crypto.createHmac('sha1', process.env.FB_APP_SECRET)
       .update(buf)
       .digest('hex');
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 require('dotenv').load();
 
-var middleware = require('botkit-middleware-watson')({
+const middleware = require('botkit-middleware-watson')({
   iam_apikey: process.env.ASSISTANT_IAM_APIKEY,
   workspace_id: process.env.WORKSPACE_ID,
   url: process.env.ASSISTANT_URL || 'https://gateway.watsonplatform.net/assistant/api',
@@ -25,29 +25,25 @@ var middleware = require('botkit-middleware-watson')({
 
 module.exports = function(app) {
   if (process.env.USE_SLACK) {
-    var Slack = require('./bot-slack');
+    const Slack = require('./bot-slack');
     Slack.controller.middleware.receive.use(middleware.receive);
     Slack.bot.startRTM();
     console.log('Slack bot is live');
   }
   if (process.env.USE_FACEBOOK) {
-    var Facebook = require('./bot-facebook');
+    const Facebook = require('./bot-facebook');
     Facebook.controller.middleware.receive.use(middleware.receive);
     Facebook.controller.createWebhookEndpoints(app, Facebook.bot);
     console.log('Facebook bot is live');
   }
   if (process.env.USE_TWILIO) {
-    var Twilio = require('./bot-twilio');
+    const Twilio = require('./bot-twilio');
     Twilio.controller.middleware.receive.use(middleware.receive);
     Twilio.controller.createWebhookEndpoints(app, Twilio.bot);
     console.log('Twilio bot is live');
   }
   // Customize your Watson Middleware object's before and after callbacks.
-  middleware.before = function(message, assistantPayload, callback) {
-    callback(null, assistantPayload);
-  };
+  middleware.before = (message, assistantPayload) => Promise.resolve(assistantPayload);
 
-  middleware.after = function(message, assistantResponse, callback) {
-    callback(null, assistantResponse);
-  };
+  middleware.after = (message, assistantResponse) => Promise.resolve(assistantResponse);
 };

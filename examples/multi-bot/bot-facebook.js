@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-var Botkit = require('botkit');
+const Botkit = require('botkit');
 
-var controller = Botkit.facebookbot({
+const controller = Botkit.facebookbot({
   access_token: process.env.FB_ACCESS_TOKEN,
   verify_token: process.env.FB_VERIFY_TOKEN
 });
 
-var bot = controller.spawn();
-controller.hears('(.*)', 'message_received', function(bot, message) {
+const bot = controller.spawn();
+controller.hears('(.*)', 'message_received', async (bot, message) => {
   if (message.watsonError) {
     console.log(message.watsonError);
     bot.reply(message, message.watsonError.description || message.watsonError.error);

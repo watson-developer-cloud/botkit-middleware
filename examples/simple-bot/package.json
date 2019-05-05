@@ -8,9 +8,10 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "botkit": "^0.7.4",
-    "botkit-middleware-watson": "^1.8.4",
-    "dotenv": "^7.0.0",
+    "botbuilder-adapter-slack": "^1.0.1",
+    "botkit": "^4.0.1",
+    "botkit-middleware-watson": "file:../../botkit-middleware-watson-2.0.0.tgz",
+    "dotenv": "^8.0.0",
     "express": "^4.16.3"
   }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-var debug = require('debug')('watson-middleware:index');
+const debug = require('debug')('watson-middleware:index');
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
-import {Storage} from 'botbuilder';
-import {readContext, updateContext, postMessage, asCallback} from './utils';
+import { Storage } from 'botbuilder';
+import { readContext, updateContext, postMessage } from './utils';
 import deepMerge = require('deepmerge');
-import {promisify} from 'util';
+import { BotkitMessage } from 'botkit';
 
 export interface MiddlewareConfig {
   version: string;
@@ -49,6 +49,11 @@ export interface Context {
   [index: string]: any;
 }
 
+export type BotkitWatsonMessage = BotkitMessage & {
+  watsonData?: Payload;
+  watsonError?: string;
+};
+
 export interface ContextDelta {
   [index: string]: any;
 }
@@ -72,10 +77,12 @@ export class WatsonMiddleware {
 
   public hear(patterns: string[], message: Botkit.BotkitMessage): boolean {
     if (message.watsonData && message.watsonData.intents) {
-      for (var p = 0; p < patterns.length; p++) {
-        for (var i = 0; i < message.watsonData.intents.length; i++) {
-          if (message.watsonData.intents[i].intent === patterns[p] &&
-            message.watsonData.intents[i].confidence >= this.minimumConfidence) {
+      for (let p = 0; p < patterns.length; p++) {
+        for (let i = 0; i < message.watsonData.intents.length; i++) {
+          if (
+            message.watsonData.intents[i].intent === patterns[p] &&
+            message.watsonData.intents[i].confidence >= this.minimumConfidence
+          ) {
             return true;
           }
         }
@@ -84,24 +91,36 @@ export class WatsonMiddleware {
     return false;
   }
 
-  public before(message: Botkit.BotkitMessage, payload: Payload, callback: (err: null | Error, payload: Payload) => null): void {
-    callback(null, payload);
+  public before(
+    message: Botkit.BotkitMessage,
+    payload: Payload
+  ): Promise<Payload> {
+    return Promise.resolve(payload);
   }
 
-  public after(message: Botkit.BotkitMessage, response: any, callback: (err: null | Error, response: any) => null): void {
-    callback(null, response);
+  public after(message: Botkit.BotkitMessage, response: any): Promise<any> {
+    return Promise.resolve(response);
   }
 
-  public async sendToWatsonAsync(bot, message: Botkit.BotkitMessage, contextDelta: ContextDelta): Promise<void> {
-    var before = promisify(this.before);
-    var after = promisify(this.after);
-
+  public async sendToWatson(
+    bot,
+    message: Botkit.BotkitMessage,
+    contextDelta: ContextDelta
+  ): Promise<void> {
     if (!this.conversation) {
-      debug('Creating Assistant object with parameters: ' + JSON.stringify(this.config, null, 2));
+      debug(
+        'Creating Assistant object with parameters: ' +
+          JSON.stringify(this.config, null, 2)
+      );
       this.conversation = new AssistantV1(this.config);
     }
 
-    if ((!message.text && message.type !== 'welcome') || this.ignoreType.indexOf(message.type) !== -1 || message.reply_to || message.bot_id) {
+    if (
+      (!message.text && message.type !== 'welcome') ||
+      this.ignoreType.indexOf(message.type) !== -1 ||
+      message.reply_to ||
+      message.bot_id
+    ) {
       // Ignore messages initiated by Slack. Reply with dummy output object
       message.watsonData = {
         output: {
@@ -116,13 +135,13 @@ export class WatsonMiddleware {
     try {
       const userContext = await readContext(message.user, this.storage);
 
-      var payload: Payload = {
+      const payload: Payload = {
         // eslint-disable-next-line @typescript-eslint/camelcase
         workspace_id: this.config.workspace_id
       };
       if (message.text) {
         // text can not contain the following characters: tab, new line, carriage return.
-        var sanitizedText = message.text.replace(/[\r\n\t]/g, ' ');
+        const sanitizedText = message.text.replace(/[\r\n\t]/g, ' ');
         payload.input = {
           text: sanitizedText
         };
@@ -138,69 +157,64 @@ export class WatsonMiddleware {
           payload.context = deepMerge(payload.context, contextDelta);
         }
       }
-      if (payload.context && payload.context.workspace_id && payload.context.workspace_id.length === 36) {
+      if (
+        payload.context &&
+        payload.context.workspace_id &&
+        payload.context.workspace_id.length === 36
+      ) {
         // eslint-disable-next-line @typescript-eslint/camelcase
         payload.workspace_id = payload.context.workspace_id;
       }
 
-      const watsonRequest = await before(message, payload);
+      const watsonRequest = await this.before(message, payload);
       let watsonResponse = await postMessage(this.conversation, watsonRequest);
-      watsonResponse = await after(message, watsonResponse);
+      watsonResponse = await this.after(message, watsonResponse);
 
       message.watsonData = watsonResponse;
       await updateContext(message.user, this.storage, watsonResponse);
-
     } catch (error) {
       message.watsonError = error;
-      debug('Error: %s', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      debug(
+        'Error: %s',
+        JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+      );
     }
   }
 
-  public async receiveAsync(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void> {
-    return this.sendToWatsonAsync(bot, message, null);
-  };
+  public async receive(
+    bot: Botkit.BotWorker,
+    message: Botkit.BotkitMessage
+  ): Promise<void> {
+    return this.sendToWatson(bot, message, null);
+  }
 
-  public async interpretAsync(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void> {
-    return this.sendToWatsonAsync(bot, message, null);
-  };
+  public async interpret(
+    bot: Botkit.BotWorker,
+    message: Botkit.BotkitMessage
+  ): Promise<void> {
+    return this.sendToWatson(bot, message, null);
+  }
 
-  public async readContextAsync(user: string): Promise<Context> {
+  public async readContext(user: string): Promise<Context> {
     if (!this.storage) {
-      throw new Error('readContext is called before the first this.receive call');
+      throw new Error(
+        'readContext is called before the first this.receive call'
+      );
     }
     return readContext(user, this.storage);
-  };
+  }
 
-  public async updateContextAsync(user: string, contextDelta: ContextDelta): Promise<{ context: Context | ContextDelta }> {
+  public async updateContext(
+    user: string,
+    contextDelta: ContextDelta
+  ): Promise<{ context: Context | ContextDelta }> {
     if (!this.storage) {
-      throw new Error('updateContext is called before the first this.receive call');
+      throw new Error(
+        'updateContext is called before the first this.receive call'
+      );
     }
-    return updateContext(
-      user,
-      this.storage,
-      {
-        context: contextDelta
-      }
-    );
-  };
-
-  public receive(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, callback: ErrorCallback): Promise<void> {
-    return asCallback(this.receiveAsync(bot, message), callback);
+    return updateContext(user, this.storage, {
+      context: contextDelta
+    });
   }
-
-  public interpret(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, callback: ErrorCallback): Promise<void> {
-    return asCallback(this.interpretAsync(bot, message), callback);
-  }
-
-  public sendToWatson(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, contextDelta: ContextDelta, callback: ErrorCallback): Promise<void> {
-    return asCallback(this.sendToWatsonAsync(bot, message, contextDelta), callback);
-  }
-
-  public readContext(user: string, callback: ErrorCallback): Promise<void> {
-    return asCallback(this.readContextAsync(user), callback);
-  };
-
-  public updateContext(user: string, contextDelta: ContextDelta, callback: ErrorCallback): Promise<void> {
-    return asCallback(this.updateContextAsync(user, contextDelta), callback);
-  };
 }

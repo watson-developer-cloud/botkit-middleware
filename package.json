@@ -2,15 +2,14 @@
   "name": "botkit-middleware-watson",
   "version": "2.0.0",
   "description": "A middleware for using Watson Assistant in a Botkit-powered bot.",
-  "main": "lib/middleware/index.js",
-  "types": "lib/middleware/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "start": "node lib/middleware/index.js",
     "build": "node ./node_modules/typescript/bin/tsc",
-    "pretest": "node ./node_modules/typescript/bin/tsc",
-    "test": "mocha test --exit",
-    "lint": "eslint lib/middleware/{index,utils}.ts",
-    "fix": "eslint --fix lib/middleware/{index,utils}.ts"
+    "pretest": "npm run build",
+    "test": "jest test --coverage",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "fix": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix ."
   },
   "repository": {
     "type": "git",
@@ -27,16 +26,23 @@
   ],
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "@types/nock": "^10.0.1",
+    "@types/sinon": "^7.0.11",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
-    "assert": "^1.4.1",
     "botbuilder-adapter-web": "^1.0.1",
     "botkit": "^4.0.1",
     "clone": "^2.1.2",
+    "codecov": "^3.3.0",
     "eslint": "^5.16.0",
-    "mocha": "^6.1.4",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "jest": "^24.8.0",
     "nock": "^10.0.6",
+    "prettier": "^1.17.0",
     "sinon": "^7.3.2",
+    "ts-jest": "^24.0.2",
     "typescript": "^3.4.5"
   },
   "dependencies": {

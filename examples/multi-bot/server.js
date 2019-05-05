@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 require('dotenv').load();
 
-var express = require('express');
-var bodyParser = require('body-parser');
-var verify = require('./security');
-var app = express();
+const express = require('express');
+const bodyParser = require('body-parser');
+const verify = require('./security');
+const app = express();
 
 app.use(bodyParser.json({
   verify: verify
 }));
 
-var port = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 app.set('port', port);
 
 require('./app')(app);
