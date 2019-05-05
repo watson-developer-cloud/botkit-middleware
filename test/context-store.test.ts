@@ -16,9 +16,9 @@
 
 import { readContext, updateContext } from '../lib/utils';
 import { Botkit, BotkitMessage } from 'botkit';
-import sinon from 'sinon';
 import { MemoryStorage } from 'botbuilder';
 import { WebAdapter } from 'botbuilder-adapter-web';
+import sinon = require('sinon');
 
 const message: BotkitMessage = {
   type: 'message',
@@ -65,7 +65,7 @@ const controller = new Botkit({
 const storage = controller.storage;
 
 test('should read context correctly', function() {
-  return readContext(message, storage).then(function(context) {
+  return readContext(message.user, storage).then(function(context) {
     expect(context).toEqual(null);
   });
 });
@@ -73,7 +73,7 @@ test('should read context correctly', function() {
 test('should suppress storage error', function() {
   const storageStub = sinon.stub(storage, 'read').rejects('error message');
 
-  return readContext(message, storage)
+  return readContext(message.user, storage)
     .then(function() {
       storageStub.restore();
     })
@@ -120,7 +120,7 @@ test('should ignore storage error on read when user is not saved yet', function(
 test('should return storage error on write', function() {
   const storageStub = sinon.stub(storage, 'write').rejects('error message');
 
-  updateContext(message.user, storage, conversation_response)
+  return updateContext(message.user, storage, conversation_response)
     .then(function(err) {
       expect(err).toEqual('error message');
       storageStub.restore();

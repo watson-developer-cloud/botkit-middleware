@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node ./node_modules/typescript/bin/tsc",
     "pretest": "npm run build",
-    "test": "jest test --coverage",
+    "test": "jest test --coverage --forceExit",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "fix": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix ."
   },

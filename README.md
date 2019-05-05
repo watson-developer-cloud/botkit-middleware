@@ -268,27 +268,24 @@ controller.on('message_received', processWatsonResponse);
 Events are messages having type different than `message`.
 
 [Example](https://github.com/howdyai/botkit/blob/master/examples/facebook_bot.js) of handler:
+
 ```js
-controller.on('facebook_postback', function(bot, message) {
- bot.reply(message, 'Great Choice!!!! (' + message.payload + ')');
+controller.on('facebook_postback', async (bot, message) => {
+ await bot.reply(message, `Great Choice. (${message.payload})`);
 });
 ```
+
 Since they usually have no text, events aren't processed by middleware and have no watsonData attribute.
 If event handler wants to make use of some data from context, it has to read it first.
 Example:
+
 ```js
-controller.on('facebook_postback', (bot, message) => {
-  watsonMiddleware.readContext(message.user).
-    then((context = {}) =>
-      //do something useful here
-      myFunction(context.field1, context.field2)
-        .then(result => {
-          const newMessage = clone(message);
-          newMessage.text = 'postback result';
-          return watsonMiddleware.sendToWatson(bot, newMessage, { postbackResult: 'success' });
-        })
-    )
-    .catch(console.error);
+controller.on('facebook_postback', async (bot, message) => {
+  const context = watsonMiddleware.readContext(message.user);
+    //do something useful here
+  const result = await myFunction(context.field1, context.field2);
+  const newMessage = {...message, text: 'postback result' };
+  await watsonMiddleware.sendToWatson(bot, newMessage, { postbackResult: 'success' });
 });
 ```
 
@@ -316,8 +313,8 @@ Used globally:
 ```js
 slackController.changeEars(watsonMiddleware.hear.bind(watsonMiddleware));
 
-slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
-  bot.reply(message, message.watsonData.output.text.join('\n'));
+slackController.hears(['hello'], ['direct_message', 'direct_mention', 'mention'], async (bot, message) => {
+  await bot.reply(message, message.watsonData.output.text.join('\n'));
   // now do something special related to the hello intent
 });
 ```
