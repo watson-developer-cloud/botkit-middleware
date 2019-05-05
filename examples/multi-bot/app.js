@@ -16,7 +16,8 @@
 
 require('dotenv').load();
 
-const middleware = require('botkit-middleware-watson')({
+const WatsonMiddleware = require('botkit-middleware-watson').WatsonMiddleware;
+const middleware = new WatsonMiddleware({
   iam_apikey: process.env.ASSISTANT_IAM_APIKEY,
   workspace_id: process.env.WORKSPACE_ID,
   url: process.env.ASSISTANT_URL || 'https://gateway.watsonplatform.net/assistant/api',
