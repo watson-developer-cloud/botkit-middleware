@@ -5,7 +5,10 @@ cache:
     - node_modules
 script:
   - npm run lint
-  - npm test
+  - npm test -- --coverage && codecov
+
+before_deploy:
+- npm run build
 deploy:
 - provider: script
   skip_cleanup: true

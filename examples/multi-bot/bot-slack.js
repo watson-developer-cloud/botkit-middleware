@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-var Botkit = require('botkit');
+const Botkit = require('botkit');
 
-var controller = Botkit.slackbot({ clientSigningSecret: process.env.SLACK_SIGNING_SECRET });
-var bot = controller.spawn({
+const controller = Botkit.slackbot({ clientSigningSecret: process.env.SLACK_SIGNING_SECRET });
+const bot = controller.spawn({
   token: process.env.SLACK_TOKEN
 });
 
-controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+controller.hears(['.*'], ['direct_message', 'direct_mention', 'mention'], async (bot, message) => {
   if (message.watsonError) {
     console.log(message.watsonError);
     bot.reply(message, message.watsonError.description || message.watsonError.error);

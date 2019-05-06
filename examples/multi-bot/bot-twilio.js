@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-var Botkit = require('botkit');
+const Botkit = require('botkit');
 
-var controller = Botkit.twilioipmbot();
-var bot = controller.spawn({
+const controller = Botkit.twilioipmbot();
+const bot = controller.spawn({
   TWILIO_IPM_SERVICE_SID: process.env.TWILIO_IPM_SERVICE_SID,
   TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
   TWILIO_API_KEY: process.env.TWILIO_API_KEY,
@@ -26,7 +26,7 @@ var bot = controller.spawn({
   identity: process.env.BOT_NAME,
   autojoin: true
 });
-controller.hears(['.*'], 'message_received', function(bot, message) {
+controller.hears(['.*'], 'message_received', async (bot, message) => {
   if (message.watsonError) {
     console.log(message.watsonError);
     bot.reply(message, message.watsonError.description || message.watsonError.error);

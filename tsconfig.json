@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es6",
     "module": "commonjs",
     "declaration": true,
     "sourceMap": true,
-    "outDir": "./lib/middleware",
-    "rootDir": "./lib/middleware",
+    "outDir": "./lib",
+    "rootDir": "./src",
     "lib": [
-      "es5",
-      "es2015",
+      "es6",
       "dom"
     ]
   },
   "include": [
-    "./lib/middleware/*"
+    "./src/*"
   ],
   "exclude": [
-    "./node_modules"
+    "./node_modules",
+    "./lib"
   ]
 }

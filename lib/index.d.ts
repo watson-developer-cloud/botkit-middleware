@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  */
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
-export interface MiddlewareConfig {
+import { BotkitMessage } from 'botkit';
+export interface WatsonMiddlewareConfig {
     version: string;
     workspace_id: string;
     url?: string;
@@ -38,6 +39,10 @@ export interface Context {
     system: any;
     [index: string]: any;
 }
+export declare type BotkitWatsonMessage = BotkitMessage & {
+    watsonData?: Payload;
+    watsonError?: string;
+};
 export interface ContextDelta {
     [index: string]: any;
 }
@@ -48,20 +53,15 @@ export declare class WatsonMiddleware {
     private storage;
     private minimumConfidence;
     private readonly ignoreType;
-    constructor(config: MiddlewareConfig);
+    constructor(config: WatsonMiddlewareConfig);
     hear(patterns: string[], message: Botkit.BotkitMessage): boolean;
-    before(message: Botkit.BotkitMessage, payload: Payload, callback: (err: null | Error, payload: Payload) => null): void;
-    after(message: Botkit.BotkitMessage, response: any, callback: (err: null | Error, response: any) => null): void;
-    sendToWatsonAsync(bot: any, message: Botkit.BotkitMessage, contextDelta: ContextDelta): Promise<void>;
-    receiveAsync(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
-    interpretAsync(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
-    readContextAsync(user: string): Promise<Context>;
-    updateContextAsync(user: string, contextDelta: ContextDelta): Promise<{
+    before(message: Botkit.BotkitMessage, payload: Payload): Promise<Payload>;
+    after(message: Botkit.BotkitMessage, response: any): Promise<any>;
+    sendToWatson(bot: any, message: Botkit.BotkitMessage, contextDelta: ContextDelta): Promise<void>;
+    receive(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
+    interpret(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
+    readContext(user: string): Promise<Context>;
+    updateContext(user: string, contextDelta: ContextDelta): Promise<{
         context: Context | ContextDelta;
     }>;
-    receive(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, callback: ErrorCallback): Promise<void>;
-    interpret(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, callback: ErrorCallback): Promise<void>;
-    sendToWatson(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, contextDelta: ContextDelta, callback: ErrorCallback): Promise<void>;
-    readContext(user: string, callback: ErrorCallback): Promise<void>;
-    updateContext(user: string, contextDelta: ContextDelta, callback: ErrorCallback): Promise<void>;
 }

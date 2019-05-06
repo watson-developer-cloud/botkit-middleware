@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 IBM Corp. All Rights Reserved.
+ * Copyright 2016-2019 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,4 +23,3 @@ export declare function updateContext(userId: string, storage: Storage, watsonRe
     context: Context | ContextDelta;
 }>;
 export declare function postMessage(conversation: AssistantV1, payload: Payload): Promise<AssistantV1.MessageResponse>;
-export declare function asCallback(promise: Promise<any>, cb: (err: null | Error, result?: any) => void): Promise<any>;
