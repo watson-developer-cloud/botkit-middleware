@@ -234,7 +234,7 @@ const checkBalance =  async (context) => {
     validAccount: true,
     accountBalance: 95.33
   };
-  await Promise.resolve(context);
+  return context;
 });
 
 const processWatsonResponse = async (bot, message) => {
@@ -328,14 +328,14 @@ They can be customized as follows:
 ```js
 middleware.before = (message, assistantPayload) => async () => {
    // Code here gets executed before making the call to Assistant.
-  return await Promise.resolve(assistantPayload);
+  return assistantPayload;
 }
 ```
 
 ```js
 middleware.after = (message, assistantResponse) => async () => {
   // Code here gets executed after the call to Assistant.
-  return await Promise.resolve(assistantResponse);
+  return assistantResponse;
 });
 ```
 
