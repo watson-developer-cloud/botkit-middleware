@@ -23,7 +23,7 @@ const service = {
   username: 'batman',
   password: 'bruce-wayne',
   url: 'http://ibm.com:80',
-  version: '2018-07-10'
+  version: '2018-07-10',
 };
 const workspaceId = 'zyxwv-54321';
 const path = `/v1/workspaces/${workspaceId}/message`;
@@ -43,21 +43,21 @@ it('should initiate a conversation', function() {
     intents: [],
     entities: [],
     input: {
-      text: 'hi'
+      text: 'hi',
     },
     output: {
       log_messages: [],
       text: ['Hello from Watson Assistant!'],
-      nodes_visited: ['node_1_1467221909631']
+      nodes_visited: ['node_1_1467221909631'],
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 1,
-        dialog_request_counter: 1
-      }
-    }
+        dialog_request_counter: 1,
+      },
+    },
   };
 
   nock(service.url)
@@ -68,8 +68,8 @@ it('should initiate a conversation', function() {
     .postMessage(conversation, {
       workspace_id: workspaceId,
       input: {
-        text: 'hi'
-      }
+        text: 'hi',
+      },
     })
     .then(function(response) {
       expect(response).toEqual(expected);
@@ -81,21 +81,21 @@ it('should continue a conversation', async () => {
     intents: [],
     entities: [],
     input: {
-      text: 'What can you do?'
+      text: 'What can you do?',
     },
     output: {
       log_messages: [],
       text: ['I can tell you about myself. I have a charming personality!'],
-      nodes_visited: ['node_3_1467221909631']
+      nodes_visited: ['node_3_1467221909631'],
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 2,
-        dialog_request_counter: 2
-      }
-    }
+        dialog_request_counter: 2,
+      },
+    },
   };
 
   nock(service.url)
@@ -105,16 +105,16 @@ it('should continue a conversation', async () => {
   const response = await utils.postMessage(conversation, {
     workspace_id: workspaceId,
     input: {
-      text: 'What can you do?'
+      text: 'What can you do?',
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 1,
-        dialog_request_counter: 1
-      }
-    }
+        dialog_request_counter: 1,
+      },
+    },
   });
   expect(response).toEqual(expected);
 });

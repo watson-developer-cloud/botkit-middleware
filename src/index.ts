@@ -23,7 +23,7 @@ import { readContext, updateContext, postMessage } from './utils';
 import deepMerge = require('deepmerge');
 import { BotkitMessage } from 'botkit';
 
-export interface MiddlewareConfig {
+export interface WatsonMiddlewareConfig {
   version: string;
   workspace_id: string;
   url?: string;
@@ -61,14 +61,14 @@ export interface ContextDelta {
 export type ErrorCallback = (err: null | Error) => null;
 
 export class WatsonMiddleware {
-  private config: MiddlewareConfig;
+  private config: WatsonMiddlewareConfig;
   private conversation: AssistantV1;
   private storage: Storage;
   private minimumConfidence: number = 0.75;
   // These are initiated by Slack itself and not from the end-user. Won't send these to WCS.
   private readonly ignoreType = ['presence_change', 'reconnect_url'];
 
-  public constructor(config: MiddlewareConfig) {
+  public constructor(config: WatsonMiddlewareConfig) {
     this.config = config;
     if (config.minimum_confidence) {
       this.minimumConfidence = config.minimum_confidence;
@@ -93,7 +93,7 @@ export class WatsonMiddleware {
 
   public before(
     message: Botkit.BotkitMessage,
-    payload: Payload
+    payload: Payload,
   ): Promise<Payload> {
     return Promise.resolve(payload);
   }
@@ -105,12 +105,12 @@ export class WatsonMiddleware {
   public async sendToWatson(
     bot,
     message: Botkit.BotkitMessage,
-    contextDelta: ContextDelta
+    contextDelta: ContextDelta,
   ): Promise<void> {
     if (!this.conversation) {
       debug(
         'Creating Assistant object with parameters: ' +
-          JSON.stringify(this.config, null, 2)
+          JSON.stringify(this.config, null, 2),
       );
       this.conversation = new AssistantV1(this.config);
     }
@@ -124,8 +124,8 @@ export class WatsonMiddleware {
       // Ignore messages initiated by Slack. Reply with dummy output object
       message.watsonData = {
         output: {
-          text: []
-        }
+          text: [],
+        },
       };
       return;
     }
@@ -137,13 +137,13 @@ export class WatsonMiddleware {
 
       const payload: Payload = {
         // eslint-disable-next-line @typescript-eslint/camelcase
-        workspace_id: this.config.workspace_id
+        workspace_id: this.config.workspace_id,
       };
       if (message.text) {
         // text can not contain the following characters: tab, new line, carriage return.
         const sanitizedText = message.text.replace(/[\r\n\t]/g, ' ');
         payload.input = {
-          text: sanitizedText
+          text: sanitizedText,
         };
       }
       if (userContext) {
@@ -176,21 +176,21 @@ export class WatsonMiddleware {
       message.watsonError = error;
       debug(
         'Error: %s',
-        JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+        JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
       );
     }
   }
 
   public async receive(
     bot: Botkit.BotWorker,
-    message: Botkit.BotkitMessage
+    message: Botkit.BotkitMessage,
   ): Promise<void> {
     return this.sendToWatson(bot, message, null);
   }
 
   public async interpret(
     bot: Botkit.BotWorker,
-    message: Botkit.BotkitMessage
+    message: Botkit.BotkitMessage,
   ): Promise<void> {
     return this.sendToWatson(bot, message, null);
   }
@@ -198,7 +198,7 @@ export class WatsonMiddleware {
   public async readContext(user: string): Promise<Context> {
     if (!this.storage) {
       throw new Error(
-        'readContext is called before the first this.receive call'
+        'readContext is called before the first this.receive call',
       );
     }
     return readContext(user, this.storage);
@@ -206,15 +206,15 @@ export class WatsonMiddleware {
 
   public async updateContext(
     user: string,
-    contextDelta: ContextDelta
+    contextDelta: ContextDelta,
   ): Promise<{ context: Context | ContextDelta }> {
     if (!this.storage) {
       throw new Error(
-        'updateContext is called before the first this.receive call'
+        'updateContext is called before the first this.receive call',
       );
     }
     return updateContext(user, this.storage, {
-      context: contextDelta
+      context: contextDelta,
     });
   }
 }

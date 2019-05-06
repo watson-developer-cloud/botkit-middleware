@@ -28,38 +28,38 @@ const message: BotkitMessage = {
   ts: '1475776074.000004',
   team: 'T2BM5DPJ6',
   incoming_message: null,
-  reference: null
+  reference: null,
 };
 
 const conversation_response = {
   intents: [],
   entities: [],
   input: {
-    text: 'Hello there!'
+    text: 'Hello there!',
   },
   output: {
     log_messages: [],
     text: [
-      'Hi. It looks like a nice drive today. What would you like me to do? '
+      'Hi. It looks like a nice drive today. What would you like me to do? ',
     ],
-    nodes_visited: ['node_1_1467221909631']
+    nodes_visited: ['node_1_1467221909631'],
   },
   context: {
     conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
     system: {
       dialog_stack: ['root'],
       dialog_turn_counter: 1,
-      dialog_request_counter: 1
+      dialog_request_counter: 1,
     },
-    default_counter: 0
-  }
+    default_counter: 0,
+  },
 };
 
 const adapter = new WebAdapter({ noServer: true });
 const controller = new Botkit({
   adapter: adapter,
   storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
-  disable_webserver: true
+  disable_webserver: true,
 });
 
 const storage = controller.storage;
@@ -102,8 +102,8 @@ test('should ignore storage error on read when user is not saved yet', function(
 
   const watsonResponse = {
     context: {
-      a: 1
-    }
+      a: 1,
+    },
   };
   return updateContext('NEWUSER3', storage, watsonResponse)
     .then(function(response) {
@@ -133,20 +133,20 @@ test('should return storage error on write', function() {
 test('should update existing context', function() {
   const firstContext = {
     a: 1,
-    b: 2
+    b: 2,
   };
   const secondContext = {
     c: 3,
-    d: 4
+    d: 4,
   };
   //first update
   return updateContext(message.user, storage, {
-    context: firstContext
+    context: firstContext,
   })
     .then(function() {
       //second update
       return updateContext(message.user, storage, {
-        context: secondContext
+        context: secondContext,
       });
     })
     .then(function() {
@@ -162,13 +162,13 @@ test('should preserve other data in storage', function() {
     id: 'U2BLZSKFX',
     profile: {
       age: 23,
-      sex: 'male'
-    }
+      sex: 'male',
+    },
   };
 
   const newContext = {
     a: 1,
-    b: 2
+    b: 2,
   };
 
   const itemId = 'user.' + user.id;
@@ -180,7 +180,7 @@ test('should preserve other data in storage', function() {
     .write(existingData)
     .then(function() {
       return updateContext(user.id, storage, {
-        context: newContext
+        context: newContext,
       });
     })
     .then(function() {

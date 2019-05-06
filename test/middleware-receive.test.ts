@@ -25,7 +25,7 @@ const service = {
   username: 'batman',
   password: 'bruce-wayne',
   url: 'http://ibm.com:80',
-  version: '2018-07-10'
+  version: '2018-07-10',
 };
 const workspaceId = 'zyxwv-54321';
 const path = `/v1/workspaces/${workspaceId}/message`;
@@ -38,19 +38,19 @@ const message: BotkitMessage = {
   ts: '1475776074.000004',
   team: 'T2BM5DPJ6',
   reference: null,
-  incoming_message: null
+  incoming_message: null,
 };
 
 const adapter = new WebAdapter({ noServer: true });
 const controller = new Botkit({
   adapter: adapter,
   storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
-  disable_webserver: true
+  disable_webserver: true,
 });
 
 const middleware = new WatsonMiddleware({
   ...service,
-  workspace_id: workspaceId
+  workspace_id: workspaceId,
 });
 let bot = null;
 
@@ -71,21 +71,21 @@ test('should make first call to Assistant', async () => {
     intents: [],
     entities: [],
     input: {
-      text: 'hi'
+      text: 'hi',
     },
     output: {
       log_messages: [],
       text: ['Hello from Watson Assistant!'],
-      nodes_visited: ['node_1_1467221909631']
+      nodes_visited: ['node_1_1467221909631'],
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 1,
-        dialog_request_counter: 1
-      }
-    }
+        dialog_request_counter: 1,
+      },
+    },
   };
   nock(service.url)
     .post(pathWithQuery)
@@ -99,28 +99,28 @@ test('should make first call to Assistant', async () => {
 test('should make second call to Assistant', async () => {
   const receivedMessage: BotkitWatsonMessage = {
     ...message,
-    text: 'What can you do?'
+    text: 'What can you do?',
   };
 
   const expectedWatsonData = {
     intents: [],
     entities: [],
     input: {
-      text: 'What can you do?'
+      text: 'What can you do?',
     },
     output: {
       log_messages: [],
       text: ['I can tell you about myself. I have a charming personality!'],
-      nodes_visited: ['node_3_1467221909631']
+      nodes_visited: ['node_3_1467221909631'],
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 2,
-        dialog_request_counter: 2
-      }
-    }
+        dialog_request_counter: 2,
+      },
+    },
   };
 
   nock(service.url)
@@ -136,21 +136,21 @@ test('should pass empty welcome message to Assistant', async () => {
     intents: [],
     entities: [],
     input: {
-      text: 'hi'
+      text: 'hi',
     },
     output: {
       log_messages: [],
       text: ['Hello from Watson Assistant!'],
-      nodes_visited: ['node_1_1467221909631']
+      nodes_visited: ['node_1_1467221909631'],
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 1,
-        dialog_request_counter: 1
-      }
-    }
+        dialog_request_counter: 1,
+      },
+    },
   };
   nock(service.url)
     .post(pathWithQuery)
@@ -166,7 +166,7 @@ test('should replace not-permitted characters in message text', async () => {
   // text can not contain the following characters: tab, new line, carriage return.
   const receivedMessage: BotkitWatsonMessage = {
     ...message,
-    text: 'What\tcan\tyou\r\ndo?'
+    text: 'What\tcan\tyou\r\ndo?',
   };
   const expectedMessage = 'What can you  do?';
 
@@ -174,21 +174,21 @@ test('should replace not-permitted characters in message text', async () => {
     intents: [],
     entities: [],
     input: {
-      text: expectedMessage
+      text: expectedMessage,
     },
     output: {
       log_messages: [],
       text: ['I can tell you about myself. I have a charming personality!'],
-      nodes_visited: ['node_3_1467221909631']
+      nodes_visited: ['node_3_1467221909631'],
     },
     context: {
       conversation_id: '8a79f4db-382c-4d56-bb88-1b320edf9eae',
       system: {
         dialog_stack: ['root'],
         dialog_turn_counter: 2,
-        dialog_request_counter: 2
-      }
-    }
+        dialog_request_counter: 2,
+      },
+    },
   };
 
   nock(service.url)

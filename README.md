@@ -228,13 +228,13 @@ A common scenario of processing actions is:
 Using sendToWatson to update context simplifies the bot code compared to solution using updateContext below.
 
 ```js
-const checkBalance =  (context) => new Promise((resolve, reject) => {
+const checkBalance =  async (context) => {
   //do something real here
   const contextDelta = {
     validAccount: true,
     accountBalance: 95.33
   };
-  resolve(context);
+  await Promise.resolve(context);
 });
 
 const processWatsonResponse = async (bot, message) => {
@@ -267,7 +267,7 @@ controller.on('message_received', processWatsonResponse);
 
 Events are messages having type different than `message`.
 
-[Example](https://github.com/howdyai/botkit/blob/master/examples/facebook_bot.js) of handler:
+[Example](https://github.com/howdyai/botkit/blob/master/packages/docs/reference/facebook.md#facebookeventtypemiddleware) of handler:
 
 ```js
 controller.on('facebook_postback', async (bot, message) => {
@@ -326,16 +326,16 @@ The _before_ and _after_ async calls can be used to perform some tasks _before_ 
 They can be customized as follows:
 
 ```js
-middleware.before = (message, assistantPayload) => new Promise((resolve, reject) => {
-  // Code here gets executed before making the call to Assistant.
-  resolve(assistantPayload);
-});
+middleware.before = (message, assistantPayload) => async () => {
+   // Code here gets executed before making the call to Assistant.
+  return await Promise.resolve(assistantPayload);
+}
 ```
 
 ```js
-middleware.after = (message, assistantResponse) => new Promise((resolve, reject) => {
+middleware.after = (message, assistantResponse) => async () => {
   // Code here gets executed after the call to Assistant.
-  resolve(assistantResponse);
+  return await Promise.resolve(assistantResponse);
 });
 ```
 

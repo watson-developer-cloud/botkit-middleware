@@ -24,7 +24,7 @@ const storagePrefix = 'user.';
 
 export async function readContext(
   userId: string,
-  storage: Storage
+  storage: Storage,
 ): Promise<Context | null> {
   const itemId = storagePrefix + userId;
 
@@ -34,7 +34,7 @@ export async function readContext(
       debug(
         'User: %s, Context: %s',
         userId,
-        JSON.stringify(result[itemId].context, null, 2)
+        JSON.stringify(result[itemId].context, null, 2),
       );
       return result[itemId].context;
     }
@@ -47,7 +47,7 @@ export async function readContext(
 export async function updateContext(
   userId: string,
   storage: Storage,
-  watsonResponse: { context: Context | ContextDelta }
+  watsonResponse: { context: Context | ContextDelta },
 ): Promise<{ context: Context | ContextDelta }> {
   const itemId = storagePrefix + userId;
 
@@ -58,7 +58,7 @@ export async function updateContext(
       debug(
         'User: %s, Data: %s',
         userId,
-        JSON.stringify(result[itemId], null, 2)
+        JSON.stringify(result[itemId], null, 2),
       );
       userData = result[itemId];
     }
@@ -77,7 +77,7 @@ export async function updateContext(
 
 export async function postMessage(
   conversation: AssistantV1,
-  payload: Payload
+  payload: Payload,
 ): Promise<AssistantV1.MessageResponse> {
   debug('Assistant Request: %s', JSON.stringify(payload, null, 2));
   const response = await conversation.message(payload);

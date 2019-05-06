@@ -27,7 +27,7 @@ const service = {
   username: 'batman',
   password: 'bruce-wayne',
   url: 'http://ibm.com:80',
-  version: '2018-07-10'
+  version: '2018-07-10',
 };
 const workspaceId = 'zyxwv-54321';
 const path = `/v1/workspaces/${workspaceId}/message`;
@@ -40,18 +40,18 @@ const message = {
   ts: '1475776074.000004',
   team: 'T2BM5DPJ6',
   reference: null,
-  incoming_message: null
+  incoming_message: null,
 };
 
 const adapter = new WebAdapter({ noServer: true });
 const controller = new Botkit({
   adapter: adapter,
   storage: new MemoryStorage(), //specifying storage explicitly eliminates 3 lines of warning output
-  disable_webserver: true
+  disable_webserver: true,
 });
 const middleware = new WatsonMiddleware({
   ...service,
-  workspace_id: workspaceId
+  workspace_id: workspaceId,
 });
 
 let bot;
@@ -77,9 +77,9 @@ test('should update context if contextDelta is provided', async () => {
       e: 3,
       f: {
         g: 4,
-        h: 5
-      }
-    }
+        h: 5,
+      },
+    },
   };
   const contextDelta = {
     b: null,
@@ -87,9 +87,9 @@ test('should update context if contextDelta is provided', async () => {
     c: {
       f: {
         g: 5,
-        i: 6
-      }
-    }
+        i: 6,
+      },
+    },
   };
   const expectedContextInRequest = {
     a: 1,
@@ -100,10 +100,10 @@ test('should update context if contextDelta is provided', async () => {
       f: {
         g: 5,
         h: 5,
-        i: 6
-      }
+        i: 6,
+      },
     },
-    j: 'new string'
+    j: 'new string',
   };
   const expectedContextInResponse: Context = {
     ...clonePrototype(expectedContextInRequest),
@@ -111,29 +111,29 @@ test('should update context if contextDelta is provided', async () => {
     system: {
       dialog_stack: ['root'],
       dialog_turn_counter: 1,
-      dialog_request_counter: 1
-    }
+      dialog_request_counter: 1,
+    },
   };
 
   const messageToSend: BotkitWatsonMessage = { ...message };
   const expectedRequest = {
     input: {
-      text: messageToSend.text
+      text: messageToSend.text,
     },
-    context: expectedContextInRequest
+    context: expectedContextInRequest,
   };
   const mockedWatsonResponse = {
     intents: [],
     entities: [],
     input: {
-      text: 'hi'
+      text: 'hi',
     },
     output: {
       log_messages: [],
       text: ['Hello from Watson Assistant!'],
-      nodes_visited: ['node_1_1467221909631']
+      nodes_visited: ['node_1_1467221909631'],
     },
-    context: expectedContextInResponse
+    context: expectedContextInResponse,
   };
 
   //verify request and return mocked response
@@ -142,7 +142,7 @@ test('should update context if contextDelta is provided', async () => {
     .reply(200, mockedWatsonResponse);
 
   await updateContext(messageToSend.user, controller.storage, {
-    context: storedContext
+    context: storedContext,
   });
   await middleware.sendToWatson(bot, messageToSend, contextDelta);
   expect(messageToSend.watsonData.context).toEqual(expectedContextInResponse);
@@ -152,7 +152,7 @@ test('should make request to different workspace, if workspace_id is set in cont
   const newWorkspaceId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
   const expectedPath = `/v1/workspaces/${newWorkspaceId}/message`;
   const storedContext = {
-    workspace_id: newWorkspaceId
+    workspace_id: newWorkspaceId,
   };
   const messageToSend: BotkitWatsonMessage = { ...message };
   const expectedContextInResponse: Context = {
@@ -161,29 +161,29 @@ test('should make request to different workspace, if workspace_id is set in cont
     system: {
       dialog_stack: ['root'],
       dialog_turn_counter: 1,
-      dialog_request_counter: 1
-    }
+      dialog_request_counter: 1,
+    },
   };
 
   const expectedRequest = {
     input: {
-      text: messageToSend.text
+      text: messageToSend.text,
     },
-    context: storedContext
+    context: storedContext,
   };
 
   const mockedWatsonResponse = {
     intents: [],
     entities: [],
     input: {
-      text: 'hi'
+      text: 'hi',
     },
     output: {
       log_messages: [],
       text: ['Hello from Watson Assistant!'],
-      nodes_visited: ['node_1_1467221909631']
+      nodes_visited: ['node_1_1467221909631'],
     },
-    context: expectedContextInResponse
+    context: expectedContextInResponse,
   };
 
   //verify request and return mocked response
@@ -193,7 +193,7 @@ test('should make request to different workspace, if workspace_id is set in cont
 
   try {
     await updateContext(messageToSend.user, controller.storage, {
-      context: storedContext
+      context: storedContext,
     });
     await middleware.sendToWatson(bot, messageToSend, {});
     expect(messageToSend.watsonError).toBeUndefined();

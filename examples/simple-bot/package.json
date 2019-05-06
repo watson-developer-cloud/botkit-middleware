@@ -10,7 +10,7 @@
   "dependencies": {
     "botbuilder-adapter-slack": "^1.0.1",
     "botkit": "^4.0.1",
-    "botkit-middleware-watson": "file:../../botkit-middleware-watson-2.0.0.tgz",
+    "botkit-middleware-watson": "^2.0.0",
     "dotenv": "^8.0.0",
     "express": "^4.16.3"
   }
