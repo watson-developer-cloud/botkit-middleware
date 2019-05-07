@@ -46,18 +46,17 @@ export declare type BotkitWatsonMessage = BotkitMessage & {
 export interface ContextDelta {
     [index: string]: any;
 }
-export declare type ErrorCallback = (err: null | Error) => null;
 export declare class WatsonMiddleware {
-    private config;
+    private readonly config;
     private conversation;
     private storage;
-    private minimumConfidence;
+    private readonly minimumConfidence;
     private readonly ignoreType;
     constructor(config: WatsonMiddlewareConfig);
     hear(patterns: string[], message: Botkit.BotkitMessage): boolean;
     before(message: Botkit.BotkitMessage, payload: Payload): Promise<Payload>;
     after(message: Botkit.BotkitMessage, response: any): Promise<any>;
-    sendToWatson(bot: any, message: Botkit.BotkitMessage, contextDelta: ContextDelta): Promise<void>;
+    sendToWatson(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, contextDelta: ContextDelta): Promise<void>;
     receive(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
     interpret(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
     readContext(user: string): Promise<Context>;

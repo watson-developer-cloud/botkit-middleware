@@ -58,13 +58,11 @@ export interface ContextDelta {
   [index: string]: any;
 }
 
-export type ErrorCallback = (err: null | Error) => null;
-
 export class WatsonMiddleware {
-  private config: WatsonMiddlewareConfig;
+  private readonly config: WatsonMiddlewareConfig;
   private conversation: AssistantV1;
   private storage: Storage;
-  private minimumConfidence: number = 0.75;
+  private readonly minimumConfidence: number = 0.75;
   // These are initiated by Slack itself and not from the end-user. Won't send these to WCS.
   private readonly ignoreType = ['presence_change', 'reconnect_url'];
 
@@ -103,7 +101,7 @@ export class WatsonMiddleware {
   }
 
   public async sendToWatson(
-    bot,
+    bot: Botkit.BotWorker,
     message: Botkit.BotkitMessage,
     contextDelta: ContextDelta,
   ): Promise<void> {
