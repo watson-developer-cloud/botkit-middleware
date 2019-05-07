@@ -2,6 +2,8 @@
 
 This document describes how to set up an Express app which talks to a Slack bot.
 
+### ⚠️ This is just a sample, please follow documentation of Botkit to create a new bot and then plug Watson middleware into it
+
 1. Install the dependencies
 
     ```
