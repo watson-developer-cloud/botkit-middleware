@@ -15,6 +15,7 @@
  */
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
+import { Context } from 'ibm-watson/assistant/v1';
 import { BotkitMessage } from 'botkit';
 export interface WatsonMiddlewareConfig {
     version: string;
@@ -33,11 +34,6 @@ export interface WatsonMiddlewareConfig {
 }
 export interface Payload extends AssistantV1.MessageRequest {
     workspace_id: string;
-}
-export interface Context {
-    conversation_id: string;
-    system: any;
-    [index: string]: any;
 }
 export declare type BotkitWatsonMessage = BotkitMessage & {
     watsonData?: Payload;
@@ -60,7 +56,7 @@ export declare class WatsonMiddleware {
     receive(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
     interpret(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
     readContext(user: string): Promise<Context>;
-    updateContext(user: string, contextDelta: ContextDelta): Promise<{
-        context: Context | ContextDelta;
+    updateContext(user: string, context: Context): Promise<{
+        context: Context;
     }>;
 }

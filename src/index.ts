@@ -18,6 +18,7 @@
 const debug = require('debug')('watson-middleware:index');
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
+import { Context } from 'ibm-watson/assistant/v1';
 import { Storage } from 'botbuilder';
 import { readContext, updateContext, postMessage } from './utils';
 import deepMerge = require('deepmerge');
@@ -41,12 +42,6 @@ export interface WatsonMiddlewareConfig {
 
 export interface Payload extends AssistantV1.MessageRequest {
   workspace_id: string;
-}
-
-export interface Context {
-  conversation_id: string;
-  system: any;
-  [index: string]: any;
 }
 
 export type BotkitWatsonMessage = BotkitMessage & {
@@ -204,15 +199,15 @@ export class WatsonMiddleware {
 
   public async updateContext(
     user: string,
-    contextDelta: ContextDelta,
-  ): Promise<{ context: Context | ContextDelta }> {
+    context: Context,
+  ): Promise<{ context: Context }> {
     if (!this.storage) {
       throw new Error(
         'updateContext is called before the first this.receive call',
       );
     }
     return updateContext(user, this.storage, {
-      context: contextDelta,
+      context: context,
     });
   }
 }
