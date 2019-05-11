@@ -220,8 +220,6 @@ A common scenario of processing actions is:
 
 ### Using sendToWatson to update context
 
-Using sendToWatson to update context simplifies the bot code compared to solution using updateContext below.
-
 ```js
 const checkBalance =  async (context) => {
   //do something real here
@@ -256,6 +254,20 @@ const processWatsonResponse = async (bot, message) => {
 };
 
 controller.on('message_received', processWatsonResponse);
+```
+
+### Using updateContext to update context
+
+sendToWatson should cover majority of use cases,
+but updateContext method can be useful when you want to update context from bot code,
+but there is no need to make a special request to Watson.
+
+```js
+if (params.amount) {
+    const context = message.watsonData.context;
+    context.paymentAmount = params.amount;
+    await watsonMiddleware.updateContext(message.user, context);
+}
 ```
 
 ## Implementing event handlers
