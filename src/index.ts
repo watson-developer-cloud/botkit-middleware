@@ -161,6 +161,10 @@ export class WatsonMiddleware {
 
       const watsonRequest = await this.before(message, payload);
       let watsonResponse = await postMessage(this.conversation, watsonRequest);
+      if (typeof watsonResponse.output.error === 'string') {
+        debug('Error: %s', watsonResponse.output.error);
+        message.watsonError = watsonResponse.output.error;
+      }
       watsonResponse = await this.after(message, watsonResponse);
 
       message.watsonData = watsonResponse;
