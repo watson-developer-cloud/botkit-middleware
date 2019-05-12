@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { Botkit, BotkitMessage } from 'botkit';
+import { Botkit } from 'botkit';
 import { updateContext } from '../lib/utils';
 import { clonePrototype } from 'clone';
 import { MemoryStorage } from 'botbuilder';
 import { WebAdapter } from 'botbuilder-adapter-web';
-import { WatsonMiddleware, BotkitWatsonMessage, Context } from '../lib/index';
+import { WatsonMiddleware, BotkitWatsonMessage } from '../lib/index';
+import { Context } from 'ibm-watson/assistant/v1';
 import nock = require('nock');
 
 //Watson Assistant params

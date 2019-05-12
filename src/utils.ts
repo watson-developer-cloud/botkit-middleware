@@ -18,7 +18,8 @@
 const debug = require('debug')('watson-middleware:utils');
 import { Storage } from 'botbuilder';
 import AssistantV1 = require('ibm-watson/assistant/v1');
-import { Payload, Context, ContextDelta } from './index';
+import { Context } from 'ibm-watson/assistant/v1';
+import { Payload } from './index';
 
 const storagePrefix = 'user.';
 
@@ -47,8 +48,8 @@ export async function readContext(
 export async function updateContext(
   userId: string,
   storage: Storage,
-  watsonResponse: { context: Context | ContextDelta },
-): Promise<{ context: Context | ContextDelta }> {
+  watsonResponse: { context: Context },
+): Promise<{ context: Context }> {
   const itemId = storagePrefix + userId;
 
   let userData: any = {};
