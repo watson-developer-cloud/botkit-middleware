@@ -15,12 +15,11 @@
  */
 import { Storage } from 'botbuilder';
 import AssistantV1 = require('ibm-watson/assistant/v1');
-import { Context } from 'ibm-watson/assistant/v1';
-import { Payload } from './index';
+import { Context, MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
 export declare function readContext(userId: string, storage: Storage): Promise<Context | null>;
 export declare function updateContext(userId: string, storage: Storage, watsonResponse: {
     context: Context;
 }): Promise<{
     context: Context;
 }>;
-export declare function postMessage(conversation: AssistantV1, payload: Payload): Promise<AssistantV1.MessageResponse>;
+export declare function postMessage(conversation: AssistantV1, payload: MessageParams): Promise<MessageResponse>;
