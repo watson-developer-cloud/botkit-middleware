@@ -18,8 +18,11 @@
 const debug = require('debug')('watson-middleware:utils');
 import { Storage } from 'botbuilder';
 import AssistantV1 = require('ibm-watson/assistant/v1');
-import { Context } from 'ibm-watson/assistant/v1';
-import { Payload } from './index';
+import {
+  Context,
+  MessageParams,
+  MessageResponse,
+} from 'ibm-watson/assistant/v1';
 
 const storagePrefix = 'user.';
 
@@ -78,8 +81,8 @@ export async function updateContext(
 
 export async function postMessage(
   conversation: AssistantV1,
-  payload: Payload,
-): Promise<AssistantV1.MessageResponse> {
+  payload: MessageParams,
+): Promise<MessageResponse> {
   debug('Assistant Request: %s', JSON.stringify(payload, null, 2));
   const response = await conversation.message(payload);
   debug('Assistant Response: %s', JSON.stringify(response, null, 2));

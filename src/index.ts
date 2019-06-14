@@ -18,6 +18,7 @@
 const debug = require('debug')('watson-middleware:index');
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
+import { MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
 import { Context } from 'ibm-watson/assistant/v1';
 import { Storage } from 'botbuilder';
 import { readContext, updateContext, postMessage } from './utils';
@@ -40,12 +41,13 @@ export interface WatsonMiddlewareConfig {
   minimum_confidence?: number;
 }
 
-export interface Payload extends AssistantV1.MessageRequest {
-  workspace_id: string;
-}
+/**
+ * @deprecated please use AssistantV1.MessageParams instead
+ */
+export type Payload = MessageParams;
 
 export type BotkitWatsonMessage = BotkitMessage & {
-  watsonData?: Payload;
+  watsonData?: MessageResponse;
   watsonError?: string;
 };
 
@@ -86,12 +88,15 @@ export class WatsonMiddleware {
 
   public before(
     message: Botkit.BotkitMessage,
-    payload: Payload,
-  ): Promise<Payload> {
+    payload: MessageParams,
+  ): Promise<MessageParams> {
     return Promise.resolve(payload);
   }
 
-  public after(message: Botkit.BotkitMessage, response: any): Promise<any> {
+  public after(
+    message: Botkit.BotkitMessage,
+    response: MessageResponse,
+  ): Promise<MessageResponse> {
     return Promise.resolve(response);
   }
 
@@ -128,7 +133,7 @@ export class WatsonMiddleware {
     try {
       const userContext = await readContext(message.user, this.storage);
 
-      const payload: Payload = {
+      const payload: MessageParams = {
         // eslint-disable-next-line @typescript-eslint/camelcase
         workspace_id: this.config.workspace_id,
       };

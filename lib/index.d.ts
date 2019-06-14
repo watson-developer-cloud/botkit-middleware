@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import Botkit = require('botkit');
-import AssistantV1 = require('ibm-watson/assistant/v1');
+import { MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
 import { Context } from 'ibm-watson/assistant/v1';
 import { BotkitMessage } from 'botkit';
 export interface WatsonMiddlewareConfig {
@@ -32,11 +32,12 @@ export interface WatsonMiddlewareConfig {
     iam_url?: string;
     minimum_confidence?: number;
 }
-export interface Payload extends AssistantV1.MessageRequest {
-    workspace_id: string;
-}
+/**
+ * @deprecated please use AssistantV1.MessageParams instead
+ */
+export declare type Payload = MessageParams;
 export declare type BotkitWatsonMessage = BotkitMessage & {
-    watsonData?: Payload;
+    watsonData?: MessageResponse;
     watsonError?: string;
 };
 export interface ContextDelta {
@@ -50,8 +51,8 @@ export declare class WatsonMiddleware {
     private readonly ignoreType;
     constructor(config: WatsonMiddlewareConfig);
     hear(patterns: string[], message: Botkit.BotkitMessage): boolean;
-    before(message: Botkit.BotkitMessage, payload: Payload): Promise<Payload>;
-    after(message: Botkit.BotkitMessage, response: any): Promise<any>;
+    before(message: Botkit.BotkitMessage, payload: MessageParams): Promise<MessageParams>;
+    after(message: Botkit.BotkitMessage, response: MessageResponse): Promise<MessageResponse>;
     sendToWatson(bot: Botkit.BotWorker, message: Botkit.BotkitMessage, contextDelta: ContextDelta): Promise<void>;
     receive(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
     interpret(bot: Botkit.BotWorker, message: Botkit.BotkitMessage): Promise<void>;
