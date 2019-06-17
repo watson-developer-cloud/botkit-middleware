@@ -68,6 +68,12 @@ export class WatsonMiddleware {
     if (config.minimum_confidence) {
       this.minimumConfidence = config.minimum_confidence;
     }
+
+    debug(
+      'Creating Assistant object with parameters: ' +
+        JSON.stringify(this.config, null, 2),
+    );
+    this.conversation = new AssistantV1(this.config);
   }
 
   public hear(patterns: string[], message: Botkit.BotkitMessage): boolean {
@@ -105,14 +111,6 @@ export class WatsonMiddleware {
     message: Botkit.BotkitMessage,
     contextDelta: ContextDelta,
   ): Promise<void> {
-    if (!this.conversation) {
-      debug(
-        'Creating Assistant object with parameters: ' +
-          JSON.stringify(this.config, null, 2),
-      );
-      this.conversation = new AssistantV1(this.config);
-    }
-
     if (
       (!message.text && message.type !== 'welcome') ||
       this.ignoreType.indexOf(message.type) !== -1 ||
