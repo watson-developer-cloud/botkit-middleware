@@ -217,4 +217,22 @@ export class WatsonMiddleware {
       context: context,
     });
   }
+
+  public async deleteUserData(customerId: string) {
+    const params = {
+      customer_id: customerId,
+      return_response: true,
+    };
+    try {
+      const response = await this.conversation.deleteUserData(params);
+      debug('deleteUserData response', response);
+    } catch (err) {
+      throw new Error(
+        'Failed to delete user data, response code: ' +
+          err.code +
+          ', message: ' +
+          err.message,
+      );
+    }
+  }
 }

@@ -60,4 +60,5 @@ export declare class WatsonMiddleware {
     updateContext(user: string, context: Context): Promise<{
         context: Context;
     }>;
+    deleteUserData(customerId: string): Promise<void>;
 }
