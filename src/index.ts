@@ -68,6 +68,12 @@ export class WatsonMiddleware {
     if (config.minimum_confidence) {
       this.minimumConfidence = config.minimum_confidence;
     }
+
+    debug(
+      'Creating Assistant object with parameters: ' +
+        JSON.stringify(this.config, null, 2),
+    );
+    this.conversation = new AssistantV1(this.config);
   }
 
   public hear(patterns: string[], message: Botkit.BotkitMessage): boolean {
@@ -105,14 +111,6 @@ export class WatsonMiddleware {
     message: Botkit.BotkitMessage,
     contextDelta: ContextDelta,
   ): Promise<void> {
-    if (!this.conversation) {
-      debug(
-        'Creating Assistant object with parameters: ' +
-          JSON.stringify(this.config, null, 2),
-      );
-      this.conversation = new AssistantV1(this.config);
-    }
-
     if (
       (!message.text && message.type !== 'welcome') ||
       this.ignoreType.indexOf(message.type) !== -1 ||
@@ -218,5 +216,23 @@ export class WatsonMiddleware {
     return updateContext(user, this.storage, {
       context: context,
     });
+  }
+
+  public async deleteUserData(customerId: string) {
+    const params = {
+      customer_id: customerId,
+      return_response: true,
+    };
+    try {
+      const response = await this.conversation.deleteUserData(params);
+      debug('deleteUserData response', response);
+    } catch (err) {
+      throw new Error(
+        'Failed to delete user data, response code: ' +
+          err.code +
+          ', message: ' +
+          err.message,
+      );
+    }
   }
 }

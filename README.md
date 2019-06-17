@@ -24,7 +24,9 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
   + [Intent matching](#intent-matching)
     - [`before` and `after`](#before-and-after)
     - [Dynamic workspace](#dynamic-workspace)
-
+* [Information security](#information-security)
+  + [Labeling user data](#labeling-user-data)
+  + [Deleting user data](#deleting-user-data)
 </details>
 
 ## Middleware Overview
@@ -45,6 +47,7 @@ This middleware plugin for [Botkit](http://howdy.ai/botkit) allows developers to
 * `readContext`: used in [implementing event handlers](#implementing-event-handlers).
 * `before`: [pre-process](#before-and-after) requests before sending to Watson Assistant (formerly Conversation).
 * `after`: [post-process](#before-and-after) responses before forwarding them to Botkit.
+* `deleteUserData`: [deletes](#information-security) all data associated with a specified customer ID.
 
 
 ## Installation
@@ -369,6 +372,36 @@ async handleHelloEvent = (bot, message) => {
 }
 
 controller.on('hello', handleHelloEvent);
+```
+
+## Information security
+
+It may be necessary to be to able delete message logs associated with particular customer in order to comply with
+[GDPR or HIPPA regulations](https://cloud.ibm.com/docs/services/assistant?topic=assistant-information-security#information-security)
+
+### Labeling User Data
+
+Messages can be labeled with customer id by adding `x-watson-metadata` header to request in `before` hook:
+
+```js
+watsonMiddleware.before = async (message, payload) => {
+	// it is up to you to implement calculateCustomerId function
+	customerId = calculateCustomerId(payload.context);
+	payload.headers['X-Watson-Metadata'] = 'customer_id=' + customerId;
+
+	return payload;
+};
+```
+
+### Deleting User Data
+
+```js
+try {
+  await watsonMiddleware.deleteUserData(customerId);
+  //Customer data was deleted successfully
+} catch (e) {
+  //Failed to delete
+}
 ```
 
 ## License
