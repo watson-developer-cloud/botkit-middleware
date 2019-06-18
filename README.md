@@ -385,11 +385,11 @@ Messages can be labeled with customer id by adding `x-watson-metadata` header to
 
 ```js
 watsonMiddleware.before = async (message, payload) => {
-	// it is up to you to implement calculateCustomerId function
-	customerId = calculateCustomerId(payload.context);
-	payload.headers['X-Watson-Metadata'] = 'customer_id=' + customerId;
-
-	return payload;
+  // it is up to you to implement calculateCustomerId function
+  customerId = calculateCustomerId(payload.context);
+  payload.headers['X-Watson-Metadata'] = 'customer_id=' + customerId;
+  
+  return payload;
 };
 ```
 
