@@ -36,7 +36,7 @@
     "botkit": "^4.0.1",
     "clone": "^2.1.2",
     "codecov": "^3.3.0",
-    "eslint": "^5.16.0",
+    "eslint": "^6.0.0",
     "eslint-config-prettier": "^5.0.0",
     "eslint-plugin-prettier": "^3.0.1",
     "husky": "^2.2.0",
