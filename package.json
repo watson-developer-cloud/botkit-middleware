@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node ./node_modules/typescript/bin/tsc --p ./tsconfig.json",
     "pretest": "npm run build",
-    "test": "jest test --coverage",
+    "test": "jest test --coverage --forceExit",
     "lint": "npm run build && eslint '*/**/*.ts' --quiet --fix",
     "version": "npm run build && git add -A lib",
     "precommit": "lint-staged"
