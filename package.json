@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "node ./node_modules/typescript/bin/tsc",
+    "build": "node ./node_modules/typescript/bin/tsc --p ./tsconfig.json",
     "pretest": "npm run build",
     "test": "jest test --coverage",
     "lint": "npm run build && eslint '*/**/*.ts' --quiet --fix",
