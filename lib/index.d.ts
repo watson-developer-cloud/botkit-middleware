@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 import Botkit = require('botkit');
+import AssistantV1 = require('ibm-watson/assistant/v1');
 import { MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
 import { Context } from 'ibm-watson/assistant/v1';
 import { BotkitMessage } from 'botkit';
-export interface WatsonMiddlewareConfig {
-    version: string;
+export interface WatsonMiddlewareConfig extends AssistantV1.Options {
     workspace_id: string;
-    url?: string;
-    token?: string;
-    headers?: {
-        [index: string]: string;
-    };
-    use_unauthenticated?: boolean;
-    username?: string;
-    password?: string;
-    iam_apikey?: string;
-    iam_url?: string;
     minimum_confidence?: number;
 }
 /**
