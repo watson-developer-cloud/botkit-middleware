@@ -15,8 +15,8 @@ plugins:
 rules:
   no-console:
     - warn
-  ' @typescript-eslint/no-explicit-any':
-    - warning
+  '@typescript-eslint/no-explicit-any':
+    - warn
   '@typescript-eslint/camelcase':
     - off
   prettier/prettier:
