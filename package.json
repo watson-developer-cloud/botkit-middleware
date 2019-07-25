@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "node ./node_modules/typescript/bin/tsc",
+    "build": "node ./node_modules/typescript/bin/tsc --p ./tsconfig.json",
     "pretest": "npm run build",
     "test": "jest test --coverage --forceExit",
     "lint": "npm run build && eslint '*/**/*.ts' --quiet --fix",
@@ -30,18 +30,17 @@
     "@types/jest": "^24.0.12",
     "@types/nock": "^10.0.1",
     "@types/sinon": "^7.0.11",
-    "@typescript-eslint/eslint-plugin": "^1.7.0",
-    "@typescript-eslint/parser": "^1.7.0",
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
     "botbuilder-adapter-web": "^1.0.1",
-    "botkit": "^4.0.1",
     "clone": "^2.1.2",
     "codecov": "^3.3.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^5.0.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "husky": "^2.2.0",
+    "husky": "^3.0.1",
     "jest": "^24.8.0",
-    "lint-staged": "^8.1.5",
+    "lint-staged": "^9.2.0",
     "nock": "^10.0.6",
     "prettier": "^1.17.0",
     "sinon": "^7.3.2",
@@ -55,8 +54,9 @@
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "deepmerge": "^3.2.0",
-    "ibm-watson": "^4.1.0"
+    "botkit": "^4.0.1",
+    "deepmerge": "^4.0.0",
+    "ibm-watson": "^4.2.5"
   },
   "lint-staged": {
     "src/**/*.ts": [
