@@ -1,2 +1,4 @@
 lib
 examples
+coverage
+test

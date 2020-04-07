@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const debug = require('debug')('watson-middleware:utils');
 import { Storage } from 'botbuilder';
 import AssistantV1 = require('ibm-watson/assistant/v1');
@@ -72,7 +73,7 @@ export async function updateContext(
 
   userData.id = userId;
   userData.context = watsonResponse.context;
-  let changes = {};
+  const changes = {};
   changes[itemId] = userData;
   await storage.write(changes);
 
