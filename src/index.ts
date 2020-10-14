@@ -29,6 +29,7 @@ import { BotkitMessage } from 'botkit';
 export interface WatsonMiddlewareConfig extends AssistantV1.Options {
   workspace_id: string;
   minimum_confidence?: number;
+  storage?: Storage;
 }
 
 /**
@@ -57,6 +58,9 @@ export class WatsonMiddleware {
     this.config = config;
     if (config.minimum_confidence) {
       this.minimumConfidence = config.minimum_confidence;
+    }
+    if(config.storage){
+      this.storage = config.storage;
     }
 
     debug(

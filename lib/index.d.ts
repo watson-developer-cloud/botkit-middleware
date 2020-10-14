@@ -17,10 +17,12 @@ import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
 import { MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
 import { Context } from 'ibm-watson/assistant/v1';
+import { Storage } from 'botbuilder';
 import { BotkitMessage } from 'botkit';
 export interface WatsonMiddlewareConfig extends AssistantV1.Options {
     workspace_id: string;
     minimum_confidence?: number;
+    storage?: Storage;
 }
 /**
  * @deprecated please use AssistantV1.MessageParams instead
