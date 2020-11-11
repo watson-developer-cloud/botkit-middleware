@@ -59,7 +59,7 @@ export class WatsonMiddleware {
     if (config.minimum_confidence) {
       this.minimumConfidence = config.minimum_confidence;
     }
-    if(config.storage){
+    if (config.storage){
       this.storage = config.storage;
     }
 
