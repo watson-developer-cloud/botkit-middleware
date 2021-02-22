@@ -19,8 +19,13 @@
 const debug = require('debug')('watson-middleware:index');
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
-import { MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
-import { Context } from 'ibm-watson/assistant/v1';
+import { AuthenticatorInterface } from 'ibm-cloud-sdk-core/auth';
+import {
+  Context,
+  MessageParams,
+  MessageResponse,
+} from 'ibm-watson/assistant/v1';
+import { IamAuthenticator } from 'ibm-watson/auth';
 import { Storage } from 'botbuilder';
 import { readContext, updateContext, postMessage } from './utils';
 import deepMerge = require('deepmerge');
@@ -54,14 +59,24 @@ export class WatsonMiddleware {
   // These are initiated by Slack itself and not from the end-user. Won't send these to WCS.
   private readonly ignoreType = ['presence_change', 'reconnect_url'];
 
-  public constructor(config: WatsonMiddlewareConfig) {
+  public constructor({
+    iam_apikey,
+    minimum_confidence,
+    storage,
+    ...config
+  }: WatsonMiddlewareConfig) {
+    if (minimum_confidence) {
+      this.minimumConfidence = minimum_confidence;
+    }
+    if (storage) {
+      this.storage = storage;
+    }
+    if (iam_apikey) {
+      config.authenticator = new IamAuthenticator({
+        apikey: iam_apikey,
+      });
+    }
     this.config = config;
-    if (config.minimum_confidence) {
-      this.minimumConfidence = config.minimum_confidence;
-    }
-    if (config.storage){
-      this.storage = config.storage;
-    }
 
     debug(
       'Creating Assistant object with parameters: ' +
@@ -126,8 +141,7 @@ export class WatsonMiddleware {
       const userContext = await readContext(message.user, this.storage);
 
       const payload: MessageParams = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        workspace_id: this.config.workspace_id,
+        workspaceId: this.config.workspace_id,
       };
       if (message.text) {
         // text can not contain the following characters: tab, new line, carriage return.
@@ -152,8 +166,7 @@ export class WatsonMiddleware {
         payload.context.workspace_id &&
         payload.context.workspace_id.length === 36
       ) {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        payload.workspace_id = payload.context.workspace_id;
+        payload.workspaceId = payload.context.workspace_id;
       }
 
       const watsonRequest = await this.before(message, payload);
@@ -214,7 +227,7 @@ export class WatsonMiddleware {
 
   public async deleteUserData(customerId: string) {
     const params = {
-      customer_id: customerId,
+      customerId: customerId,
       return_response: true,
     };
     try {

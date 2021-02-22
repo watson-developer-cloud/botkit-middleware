@@ -17,11 +17,11 @@
 import utils = require('../lib/utils');
 import nock = require('nock');
 import AssistantV1 = require('ibm-watson/assistant/v1');
+import { NoAuthAuthenticator } from 'ibm-watson/auth';
 
 //Watson Assistant params
 const service = {
-  username: 'batman',
-  password: 'bruce-wayne',
+  authenticator: new NoAuthAuthenticator(),
   url: 'http://ibm.com:80',
   version: '2018-07-10',
 };
@@ -66,7 +66,7 @@ it('should initiate a conversation', function() {
 
   return utils
     .postMessage(conversation, {
-      workspace_id: workspaceId,
+      workspaceId: workspaceId,
       input: {
         text: 'hi',
       },
@@ -103,7 +103,7 @@ it('should continue a conversation', async () => {
     .reply(200, expected);
 
   const response = await utils.postMessage(conversation, {
-    workspace_id: workspaceId,
+    workspaceId: workspaceId,
     input: {
       text: 'What can you do?',
     },

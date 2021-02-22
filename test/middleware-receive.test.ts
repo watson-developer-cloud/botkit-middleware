@@ -17,13 +17,13 @@
 import { Botkit, BotkitMessage } from 'botkit';
 import { MemoryStorage } from 'botbuilder';
 import { WebAdapter } from 'botbuilder-adapter-web';
-import { WatsonMiddleware, BotkitWatsonMessage } from '../lib/index';
+import { WatsonMiddleware, BotkitWatsonMessage } from '../lib';
+import { NoAuthAuthenticator } from 'ibm-watson/auth';
 import nock = require('nock');
 
 //Watson Assistant params
 const service = {
-  username: 'batman',
-  password: 'bruce-wayne',
+  authenticator: new NoAuthAuthenticator(),
   url: 'http://ibm.com:80',
   version: '2018-07-10',
 };
