@@ -87,5 +87,5 @@ export async function postMessage(
   debug('Assistant Request: %s', JSON.stringify(payload, null, 2));
   const response = await conversation.message(payload);
   debug('Assistant Response: %s', JSON.stringify(response, null, 2));
-  return response;
+  return response.result;
 }

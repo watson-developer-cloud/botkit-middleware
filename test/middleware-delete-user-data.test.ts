@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { WatsonMiddleware } from '../lib/index';
+import { WatsonMiddleware } from '../lib';
 import nock = require('nock');
+import { NoAuthAuthenticator } from 'ibm-watson/auth';
 
 //Watson Assistant params
 const service = {
-  username: 'batman',
-  password: 'bruce-wayne',
+  authenticator: new NoAuthAuthenticator(),
   url: 'http://ibm.com:80',
   version: '2018-07-10',
 };

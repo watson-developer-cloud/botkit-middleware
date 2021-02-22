@@ -15,8 +15,7 @@
  */
 import Botkit = require('botkit');
 import AssistantV1 = require('ibm-watson/assistant/v1');
-import { MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
-import { Context } from 'ibm-watson/assistant/v1';
+import { Context, MessageParams, MessageResponse } from 'ibm-watson/assistant/v1';
 import { Storage } from 'botbuilder';
 import { BotkitMessage } from 'botkit';
 export interface WatsonMiddlewareConfig extends AssistantV1.Options {
@@ -41,7 +40,7 @@ export declare class WatsonMiddleware {
     private storage;
     private readonly minimumConfidence;
     private readonly ignoreType;
-    constructor(config: WatsonMiddlewareConfig);
+    constructor({ iam_apikey, minimum_confidence, storage, ...config }: WatsonMiddlewareConfig);
     hear(patterns: string[], message: Botkit.BotkitMessage): boolean;
     before(message: Botkit.BotkitMessage, payload: MessageParams): Promise<MessageParams>;
     after(message: Botkit.BotkitMessage, response: MessageResponse): Promise<MessageResponse>;
